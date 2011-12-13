@@ -1,0 +1,7 @@
+# Compiled source #
+
+*.o
+*.so
+*.ko
+.*.cmd
+
