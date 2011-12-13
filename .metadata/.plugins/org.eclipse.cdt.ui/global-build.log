@@ -1,0 +1,66 @@
+
+**** Build of configuration Default for project rt-app ****
+
+make all 
+make -C ~/src/linux-2.6.14-imx21-xenomai M=/home/redsuser/etudiant/villet/iem-space-invader/rt-app ARCH=arm CROSS_COMPILE=arm-unknown-linux-gnu-
+make[1]: entrant dans le répertoire « /home/redsuser/src/linux-2.6.14-imx21-xenomai »
+  CC [M]  /home/redsuser/etudiant/villet/iem-space-invader/rt-app/pca9554-m.o
+  CC [M]  /home/redsuser/etudiant/villet/iem-space-invader/rt-app/xeno-i2c.o
+  CC [M]  /home/redsuser/etudiant/villet/iem-space-invader/rt-app/xeno-ts.o
+  CC [M]  /home/redsuser/etudiant/villet/iem-space-invader/rt-app/xeno-ts-lib.o
+  CC [M]  /home/redsuser/etudiant/villet/iem-space-invader/rt-app/rt-app-m.o
+/home/redsuser/etudiant/villet/iem-space-invader/rt-app/rt-app-m.c:13:25: native/task.h: No such file or directory
+/home/redsuser/etudiant/villet/iem-space-invader/rt-app/rt-app-m.c:14:25: native/intr.h: No such file or directory
+make[1]: quittant le répertoire « /home/redsuser/src/linux-2.6.14-imx21-xenomai »
+/home/redsuser/etudiant/villet/iem-space-invader/rt-app/rt-app-m.c:15:26: native/event.h: No such file or directory
+/home/redsuser/etudiant/villet/iem-space-invader/rt-app/rt-app-m.c:16:26: native/alarm.h: No such file or directory
+/home/redsuser/etudiant/villet/iem-space-invader/rt-app/rt-app-m.c:17:26: native/timer.h: No such file or directory
+/home/redsuser/etudiant/villet/iem-space-invader/rt-app/rt-app-m.c:18:26: native/mutex.h: No such file or directory
+In file included from /home/redsuser/etudiant/villet/iem-space-invader/rt-app/rt-app-m.c:23:
+/home/redsuser/etudiant/villet/iem-space-invader/rt-app/pca9554-m.h:2: warning: "struct inode" declared inside parameter list
+/home/redsuser/etudiant/villet/iem-space-invader/rt-app/pca9554-m.h:2: warning: its scope is only this definition or declaration, which is probably not what you want
+/home/redsuser/etudiant/villet/iem-space-invader/rt-app/pca9554-m.h:3: warning: "struct inode" declared inside parameter list
+/home/redsuser/etudiant/villet/iem-space-invader/rt-app/pca9554-m.h:4: warning: "struct inode" declared inside parameter list
+/home/redsuser/etudiant/villet/iem-space-invader/rt-app/rt-app-m.c:26: error: parse error before "isrDesc"
+/home/redsuser/etudiant/villet/iem-space-invader/rt-app/rt-app-m.c:26: warning: type defaults to `int' in declaration of `isrDesc'
+/home/redsuser/etudiant/villet/iem-space-invader/rt-app/rt-app-m.c:26: warning: data definition has no type or storage class
+/home/redsuser/etudiant/villet/iem-space-invader/rt-app/rt-app-m.c: In function `space_invader':
+/home/redsuser/etudiant/villet/iem-space-invader/rt-app/rt-app-m.c:36: warning: implicit declaration of function `rt_intr_enable'
+/home/redsuser/etudiant/villet/iem-space-invader/rt-app/rt-app-m.c: At top level:
+/home/redsuser/etudiant/villet/iem-space-invader/rt-app/rt-app-m.c:54: warning: "struct xnintr" declared inside parameter list
+/home/redsuser/etudiant/villet/iem-space-invader/rt-app/rt-app-m.c: In function `imx_i2c_handler':
+/home/redsuser/etudiant/villet/iem-space-invader/rt-app/rt-app-m.c:66: error: `RT_INTR_HANDLED' undeclared (first use in this function)
+/home/redsuser/etudiant/villet/iem-space-invader/rt-app/rt-app-m.c:66: error: (Each undeclared identifier is reported only once
+/home/redsuser/etudiant/villet/iem-space-invader/rt-app/rt-app-m.c:66: error: for each function it appears in.)
+/home/redsuser/etudiant/villet/iem-space-invader/rt-app/rt-app-m.c: In function `init_module':
+/home/redsuser/etudiant/villet/iem-space-invader/rt-app/rt-app-m.c:74: warning: implicit declaration of function `rt_timer_set_mode'
+/home/redsuser/etudiant/villet/iem-space-invader/rt-app/rt-app-m.c:76: error: `TM_ONESHOT' undeclared (first use in this function)
+/home/redsuser/etudiant/villet/iem-space-invader/rt-app/rt-app-m.c:98: warning: implicit declaration of function `rt_intr_create'
+/home/redsuser/etudiant/villet/iem-space-invader/rt-app/rt-app-m.c: In function `cleanup_module':
+/home/redsuser/etudiant/villet/iem-space-invader/rt-app/rt-app-m.c:126: warning: implicit declaration of function `rt_intr_delete'
+make[2]: *** [/home/redsuser/etudiant/villet/iem-space-invader/rt-app/rt-app-m.o] Erreur 1
+make[1]: *** [_module_/home/redsuser/etudiant/villet/iem-space-invader/rt-app] Erreur 2
+make: *** [default] Erreur 2
+
+**** Build Finished ****
+
+**** Build of configuration Default for project rt-app ****
+
+make all 
+make -C /home/redsuser/src/linux-2.6.14-imx21-xenomai M=/home/redsuser/etudiant/villet/iem-space-invader/rt-app ARCH=arm CROSS_COMPILE=arm-unknown-linux-gnu-
+make[1]: entrant dans le répertoire « /home/redsuser/src/linux-2.6.14-imx21-xenomai »
+  CC [M]  /home/redsuser/etudiant/villet/iem-space-invader/rt-app/pca9554-m.o
+  CC [M]  /home/redsuser/etudiant/villet/iem-space-invader/rt-app/xeno-i2c.o
+  CC [M]  /home/redsuser/etudiant/villet/iem-space-invader/rt-app/xeno-ts.o
+  CC [M]  /home/redsuser/etudiant/villet/iem-space-invader/rt-app/xeno-ts-lib.o
+  LD [M]  /home/redsuser/etudiant/villet/iem-space-invader/rt-app/rt-app.o
+  LD [M]  /home/redsuser/etudiant/villet/iem-space-invader/rt-app/pca9554.o
+  Building modules, stage 2.
+*** Warning: "pca9554_open" [/home/redsuser/etudiant/villet/iem-space-invader/rt-app/rt-app.ko] undefined!
+  MODPOST
+*** Warning: "pca9554_close" [/home/redsuser/etudiant/villet/iem-space-invader/rt-app/rt-app.ko] undefined!
+  LD [M]  /home/redsuser/etudiant/villet/iem-space-invader/rt-app/pca9554.ko
+  LD [M]  /home/redsuser/etudiant/villet/iem-space-invader/rt-app/rt-app.ko
+make[1]: quittant le répertoire « /home/redsuser/src/linux-2.6.14-imx21-xenomai »
+
+**** Build Finished ****
