@@ -13,7 +13,10 @@ int init()
 
 int menu()
 {
+	fb_rect_fill(0, 319, 0, 239, 0);
+	fb_print_string(255, 0, "SPACE INVADERS", 50, 140);
 
+	return 0;
 }
 
 
@@ -34,7 +37,10 @@ int main(int argc, char **argv) {
 		others:
 	}
 
+	while(1);
+
 
 	return 0;
 
 }
+
