@@ -22,19 +22,33 @@
 #include "lcdlib.h"
 #include "pca9554-m.h"
 #include "rt-app-m.h"
+#include "menu.h"
+
 
 static RT_INTR isrDesc;
+static RT_TASK	menu_task;
 
 static int space_invader(void)
 {
 	int err;
 
 
-	/* To Be Completed */
-	// TODO FU
+	printk("Start space_invader\n");
 
+
+	// Création de la tâche gérant le menu
+	err =  rt_task_spawn (&menu_task, "menu", STACK_SIZE, 50, 0, menu, 0);
+	if (err != 0) {
+		printk("menu task creation failed: %d\n", err);
+		goto fail;
+	}
+
+
+	printk("Task created\n");
 
 	err = rt_intr_enable(&isrDesc);
+
+	printk("Intr enable\n");
 
 	if (err != 0) {
 		printk("rt-app: Could not enable I2C ISR\n");
@@ -43,6 +57,7 @@ static int space_invader(void)
 
 	printk("rt-app: Enabled ISR\n");
 
+	printk("End space_invader\n");
 	return 0;
 
 fail:
@@ -88,12 +103,12 @@ int __init init_module(void) {
 	xeno_ts_init();
 	printk("rt-app: Touchscreen initialized\n");
 
-	/* Open Philips controller */
+	/* Open Philips controller
 	err = pca9554_open(NULL, NULL);
 	if (err != 0) {
 		printk("rt-app: %s: I2C slave open error: %d\n", __func__, err);
 		goto fail_open;
-	}
+	}*/
 
 	/* Initializing IRQ */
 	err = rt_intr_create(&isrDesc, "IMX_I2C", INT_I2C, imx_i2c_handler, NULL, 0);
@@ -109,8 +124,8 @@ int __init init_module(void) {
 
 	return space_invader();
 
-fail_open:
-	pca9554_close(NULL, NULL);
+//fail_open:
+//	pca9554_close(NULL, NULL);
 
 fail_intr:
 	xeno_ts_exit();
@@ -125,8 +140,9 @@ void __exit cleanup_module(void) {
 
 
 	rt_intr_delete(&isrDesc);
+	rt_task_delete(&menu_task);
 
-	pca9554_close(NULL, NULL);
+//	pca9554_close(NULL, NULL);
 
 	xeno_ts_exit();
 }
