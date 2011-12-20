@@ -4,16 +4,11 @@
 make all 
 make -C /home/redsuser/src/linux-2.6.14-imx21-xenomai M=/home/redsuser/etudiant/villet/iem-space-invader/rt-app ARCH=arm CROSS_COMPILE=arm-unknown-linux-gnu-
 make[1]: entrant dans le répertoire « /home/redsuser/src/linux-2.6.14-imx21-xenomai »
-  CC [M]  /home/redsuser/etudiant/villet/iem-space-invader/rt-app/pca9554-m.o
-  CC [M]  /home/redsuser/etudiant/villet/iem-space-invader/rt-app/xeno-i2c.o
-  CC [M]  /home/redsuser/etudiant/villet/iem-space-invader/rt-app/xeno-ts.o
-  CC [M]  /home/redsuser/etudiant/villet/iem-space-invader/rt-app/xeno-ts-lib.o
+  CC [M]  /home/redsuser/etudiant/villet/iem-space-invader/rt-app/menu.o
   LD [M]  /home/redsuser/etudiant/villet/iem-space-invader/rt-app/rt-app.o
   LD [M]  /home/redsuser/etudiant/villet/iem-space-invader/rt-app/pca9554.o
   Building modules, stage 2.
-*** Warning: "pca9554_open" [/home/redsuser/etudiant/villet/iem-space-invader/rt-app/rt-app.ko] undefined!
   MODPOST
-*** Warning: "pca9554_close" [/home/redsuser/etudiant/villet/iem-space-invader/rt-app/rt-app.ko] undefined!
   LD [M]  /home/redsuser/etudiant/villet/iem-space-invader/rt-app/pca9554.ko
   LD [M]  /home/redsuser/etudiant/villet/iem-space-invader/rt-app/rt-app.ko
 make[1]: quittant le répertoire « /home/redsuser/src/linux-2.6.14-imx21-xenomai »

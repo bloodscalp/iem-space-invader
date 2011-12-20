@@ -17,9 +17,11 @@
 #define GREEN(a_green)	(((a_green) & 0x3f)<< 5)
 #define BLUE(a_blue)	(((a_blue)  & 0x1f)<< 0)
 
+/*
 typedef enum {
 	false = 0, true = 1
 } bool;
+*/
 
 /**
  * Get a 32-bit (unsigned) random number
