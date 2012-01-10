@@ -65,20 +65,15 @@ int pca9554_close(struct inode *inode, struct file *file) {
 ssize_t pca9554_read(struct file *file, char __user *buff, size_t len, loff_t *off) {
 	int err;
 	int i;
-	char fileBuff[2*len+1];
+	char localBuff[1];
 
-	if( (err = xeno_i2c_read(buff, len)) < 0) {
+	if( (err = xeno_i2c_read(localBuff, len)) < 0) {
 		printk("I2C read error : %d", err);
 		return err;
 	}
 
-	for(i=0; i<2*len+1; i+=2){
-		fileBuff[i] = buff[i];
-		fileBuff[i+1] = '\n';
-	}
-	fileBuff[i] = 0x05;
+	cpoy_to_user(localBuff, buff);
 
-	fwrite(file, fileBuff);
 
 	return 0;
 }
