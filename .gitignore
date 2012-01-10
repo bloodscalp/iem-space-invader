@@ -23,6 +23,7 @@
 # Logs and databases #
 ######################
 .metadata
+rt-app/.tmp_versions
 *.log
 *.sql
 *.sqlite
@@ -31,9 +32,4 @@
 ######################
 .DS_Store*
 ehthumbs.db
-Icon?
 Thumbs.db
-
-
-
-
