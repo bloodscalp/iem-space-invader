@@ -26,7 +26,6 @@
 
 
 static RT_INTR isrDesc;
-static RT_TASK	menu_task;
 
 static int space_invader(void)
 {
@@ -37,14 +36,21 @@ static int space_invader(void)
 
 
 	// Création de la tâche gérant le menu
-	err =  rt_task_spawn (&menu_task, "menu", STACK_SIZE, 50, 0, menu, 0);
+	err =  rt_task_create (&menu_task, "menu", STACK_SIZE, 50, 0);
 	if (err != 0) {
 		printk("menu task creation failed: %d\n", err);
 		goto fail;
 	}
 
-
 	printk("Task created\n");
+
+	err = rt_task_start(&menu_task, menu, 0);
+	if (err != 0) {
+		printk("menu task start failed: %d\n", err);
+		goto fail;
+	}
+
+	printk("Task started\n");
 
 	err = rt_intr_enable(&isrDesc);
 

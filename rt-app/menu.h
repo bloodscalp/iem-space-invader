@@ -6,5 +6,9 @@
  */
 
 
+
+
+extern RT_TASK menu_task;
+
 int menu_select(void);
 extern void menu(void* cookie);

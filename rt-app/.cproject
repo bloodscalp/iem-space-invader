@@ -36,6 +36,7 @@
 								<option id="org.eclipse.cdt.build.core.settings.holder.symbols.1847802631" name="Symbols" superClass="org.eclipse.cdt.build.core.settings.holder.symbols" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="__KERNEL__=1"/>
 									<listOptionValue builtIn="false" value="&quot;loff_t=long long&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;u_int64_t=long long&quot;"/>
 								</option>
 								<inputType id="org.eclipse.cdt.build.core.settings.holder.inType.36349241" languageId="org.eclipse.cdt.core.gcc" languageName="GNU C" sourceContentType="org.eclipse.cdt.core.cSource,org.eclipse.cdt.core.cHeader" superClass="org.eclipse.cdt.build.core.settings.holder.inType"/>
 							</tool>
