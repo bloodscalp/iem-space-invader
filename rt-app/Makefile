@@ -19,7 +19,7 @@ TOOL_PREFIX	:= arm-unknown-linux-gnu
 CC = $(TOOL_PREFIX)-gcc
 
 obj-m = rt-app.o pca9554.o 
-rt-app-objs := xeno-ts.o xeno-ts-lib.o xeno-i2c.o rt-app-m.o lcdlib.o menu.o
+rt-app-objs := xeno-ts.o xeno-ts-lib.o xeno-i2c.o rt-app-m.o lcdlib.o menu.o game.o
 pca9554-objs := pca9554-m.o xeno-i2c.o
 
 KDIR	= ${HOME}/src/linux-2.6.14-imx21-xenomai
