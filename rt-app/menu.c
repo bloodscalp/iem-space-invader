@@ -11,6 +11,7 @@
 #include "rt-app-m.h"
 #include "xeno-ts.h"
 #include "menu.h"
+#include "game.h"
 
 #define PERIOD_TASK_MENU 200
 
@@ -24,17 +25,16 @@ int Xaffichage = 15;
 const int nbMenu = 3;
 int espacement = 15;
 
-void menu_display(void)
+void menu_display(char ** menu, const int nbMenu)
 {
 
 	int Xaffichage = Xstart;
 	int Yaffichage = Ystart;
 	int tailleDegrade = 5;
 
-	const int nbMenu = 3;
 	int i, j;
 
-	char *menu[3] = {"New Game", "Top 10", "About"};
+
 
 	// Background Black
 	fb_rect_fill(0, LCD_MAX_Y-1, 0, LCD_MAX_X-1, 0);
@@ -123,22 +123,53 @@ int menu_select(void)
 	return -1;
 }
 
+void new_game(void)
+{
+	char *menu[3] = {"Easy", "Medium", "Hard"};
+
+	// Affichage du menu
+	menu_display(menu, 3);
+
+	// Attend que l'utilisateur touche l'écran et lance la fonction
+	// correspondante à son choix
+	switch(menu_select())
+	{
+		case 0:	printk("Easy\n");
+				difficulty = 1;
+				break;
+		case 1: printk("Medium\n");
+				difficulty = 2;
+				break;
+		case 2: printk("Hard\n");
+				difficulty = 3;
+				break;
+		default:
+				printk("error menu_select\n");
+				break;
+	}
+
+	rt_task_wait_period(NULL);
+
+}
+
 
 void menu(void* cookie)
 {
-	printk("Start menu\n");
+	char *menu[3] = {"New Game", "Top 10", "About"};
 
+	printk("Start menu\n");
 
 	while(1){
 
 		// Affichage du menu
-		menu_display();
+		menu_display(menu, 3);
 
 		// Attend que l'utilisateur touche l'écran et lance la fonction
 		// correspondante à son choix
 		switch(menu_select())
 		{
 			case 0:	printk("new_game()\n");
+					new_game();
 					break;
 			case 1: printk("top10()\n");
 					break;
