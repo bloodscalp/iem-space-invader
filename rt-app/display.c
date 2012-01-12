@@ -24,7 +24,7 @@
 
 RT_TASK refresh_task;
 
-void refresh(void)
+extern void refresh(void* cookie)
 {
 
 	int err;

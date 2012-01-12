@@ -47,9 +47,9 @@ int game_init(void)
 
 	player[0].enable = 1;
 	player[0].x = LCD_MAX_X/2;
-	player[0].enable = LCD_MAX_Y - 20;
+	player[0].y = LCD_MAX_Y - 20;
 
-	// Création de la tâche gérant le menu
+	// Création de la tâche gérant le rafraichissement de l'écran
 	err =  rt_task_create (&refresh_task, "menu", STACK_SIZE, 50, 0);
 	if (err != 0) {
 		printk("menu task creation failed: %d\n", err);
