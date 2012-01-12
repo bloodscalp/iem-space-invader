@@ -40,5 +40,6 @@ extern unsigned int difficulty;
 
 void game_main(void);
 void ennemi_init(void);
+void move_player(void *cookie);
 
 #endif /* GAME_H_ */
