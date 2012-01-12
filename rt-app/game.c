@@ -21,7 +21,6 @@
 #include "rt-app-m.h"
 
 #include "game.h"
-#include "ennemi.h"
 #include "lcdlib.h"
 #include "display.h"
 
@@ -68,21 +67,27 @@ int game_init(void) {
 
 // Défini une nouvelle vague d'ennemis
 void ennemi_init(void) {
+
 	int i, j;
 	// position de départ de la vague d'ennemis
-	int xStart = 10;
-	int yStart = 10;
+
 	int err;
 	int nbEnnemiParVague = nbEnnemis / nbVagueEnnemis;
 
+	// initialisation vaisseaux ennemis
 	for (i = 0; i < nbVagueEnnemis; i++) {
 
 		for (j = 0; j < nbEnnemiParVague; j++) {
 			// Active tous les ennemis
 			ennemi[i * nbEnnemiParVague + j].enable = 1;
 			// Réinitialise les positions
-			ennemi[i * nbEnnemiParVague + j].x = xStart + (j * 18);
-			ennemi[i * nbEnnemiParVague + j].y = yStart + (i * 18);
+			ennemi[i * nbEnnemiParVague + j].x = xStart + (j * (SHIT_SIZE
+					+ X_SPACE));
+			ennemi[i * nbEnnemiParVague + j].y = yStart + (i * (SHIT_SIZE
+					+ Y_SPACE));
+			// Initialise le nombre de point de vie selon la difficulté
+			ennemi[i * nbEnnemiParVague + j].pv = difficulty
+					* DEFAULT_PV_ENNEMI;
 		}
 
 	}
@@ -96,7 +101,7 @@ void ennemi_init(void) {
 
 	printk("Task created\n");
 
-	err = rt_task_start(&ennemi_task, VaisseauxEnnemi, 0);
+	err = rt_task_start(&ennemi_task, move_ennemi, 0);
 	if (err != 0) {
 		printk("menu task start failed: %d\n", err);
 
@@ -104,6 +109,137 @@ void ennemi_init(void) {
 
 }
 
+void move_ennemi(void* cookie) {
+
+	int err;
+	int i;
+	//int ennemisEnable = 1;
+	int direction = DIRECTION_EST;
+	int yFirstEnnemi = yStart;
+	bool directionChanged = false;
+
+	// Configuration de la tâche périodique
+	if (TIMER_PERIODIC) {
+		err = rt_task_set_periodic(&ennemi_task, TM_NOW, PERIOD_TASK_ENNEMI);
+		if (err != 0) {
+			printk("Menu task set periodic failed: %d\n", err);
+			return;
+		}
+
+	} else {
+		err = rt_task_set_periodic(&ennemi_task, TM_NOW, PERIOD_TASK_ENNEMI
+				* MS);
+		if (err != 0) {
+			printk("Menu task set periodic failed: %d\n", err);
+			return;
+		}
+	}
+	while (1) {
+		while (detectShitEnable()) {
+
+			// Position dernier vaisseaux en x
+			int xLastEnnemi;
+			// Position dernier vaisseaux en y
+			int yLastEnnemi;
+
+			/****************************************************************/
+
+			/* Détection xLastEnnemi
+			 *
+			 * Nous testons si un des vaisseaux ennemis a touché
+			 * un bord (est/ouest), ceci, en fonction de leurs directions.
+			 *
+			 */
+
+			if (direction == DIRECTION_EST) {
+				xLastEnnemi = 0;
+				// detection du vaisseau le plus à l'est
+				for (i = 0; i < nbEnnemis; i++) {
+					if ((ennemi[i].x > xLastEnnemi) && (ennemi[i].enable == 1)) {
+						xLastEnnemi = ennemi[i].x;
+						directionChanged = true;
+					}
+
+				}
+				// détection vaisseaux touchent le bord à l'est
+				if (xLastEnnemi + SHIT_SIZE == EDGE_EAST) {
+					direction = DIRECTION_OUEST;
+					yFirstEnnemi+=Y_SPACE;
+				}
+
+			} else {
+				xLastEnnemi = EDGE_EAST;
+				// detection du vaisseau le plus à l'ouest
+				for (i = 0; i < nbEnnemis; i++) {
+					if ((ennemi[i].x < xLastEnnemi) && (ennemi[i].enable == 1)) {
+						xLastEnnemi = ennemi[i].x;
+					}
+				}
+				// détection vaisseaux touchent le bord à l'est
+				if (xLastEnnemi == EDGE_WEST) {
+					direction = DIRECTION_EST;
+					directionChanged = true;
+				}
+			}
+
+			/****************************************************************/
+
+			/* Détection yLastEnnemi
+			 *
+			 * Peu etre utilisé lorsque les vaisseaux ennemis
+			 * atteignent les vaisseaux alliés
+			 */
+
+			yLastEnnemi = 0;
+			// detection vaisseaux le plus au sud
+			for (i = 0; i < nbEnnemis; i++) {
+				if ((ennemi[i].y > yLastEnnemi) && (ennemi[i].enable == 1)) {
+					yLastEnnemi = ennemi[i].y;
+				}
+
+			}
+
+			/****************************************************************/
+
+			/* Deplacement vaisseaux ennemis
+			 *
+			 * Après avoir effectué les tests de direction, nous pouvons alors
+			 * déplacer les vaisseaux ennemis vers l'est ou l'ouest.
+			 *
+			 */
+
+			for (i = 0; i < nbEnnemis; i++) {
+				if (directionChanged) {
+					ennemi[i].y += STEP_MOVE_ENNEMI;
+					directionChanged = false;
+				}else{
+					ennemi[i].x += STEP_MOVE_ENNEMI * direction;
+				}
+
+			}
+			/****************************************************************/
+
+		}
+		// tous les vaisseaux ennemis ont été détruit : nouveau niveau !
+		printk("Vaisseaux ennemis abattus");
+		printk("new level");
+	}
+
+}
+/*
+ * Fonction qui retourne "true" s'il existe encore
+ * un vaisseau ennemi en vie
+ */
+bool detectShitEnable(void) {
+	int i;
+	// Test s'il existe encore un vaisseau ennemi
+	for (i = 0; i < nbEnnemis; i++) {
+		if (ennemi[i].enable == 1) {
+			return true;
+		}
+	}
+	return false;
+}
 void game_main(void) {
 	if (game_init() < 0) {
 		printk("game_init() failed");

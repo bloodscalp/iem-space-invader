@@ -28,8 +28,7 @@ struct cdev *i2c_dev;
 typedef enum pca9554_state_t {
 	DISABLED,
 	INITIALIZED,
-	CONFIGURED,
-	ENABLED
+	CONFIGURED
 } pca9554_state_t;
 
 pca9554_state_t pca9554_state = DISABLED;
@@ -70,11 +69,10 @@ int pca9554_ioctl(struct inode * inode, struct file *file, unsigned int cmd,
 	return 0;
 }
 
-ssize_t pca9554_read(struct file *file, char __user *buff, size_t len,
-		loff_t *off) {
+ssize_t pca9554_read(struct file *file, char __user *buff, size_t len, loff_t *off) {
 
-	int err, err_size;
-	char kbuf[BUFF_SIZE];
+	int err;
+	char kbuf[len];
 
 	if(pca9554_state == CONFIGURED) {
 		kbuf[0] = INPUT;
@@ -84,15 +82,14 @@ ssize_t pca9554_read(struct file *file, char __user *buff, size_t len,
 			return err;
 		}
 
-		if ((err_size = xeno_i2c_read(kbuf, BUFF_SIZE)) < 0) {
-			printk("I2C read error : %d\n", err_size);
-			return err_size;
+		if ((err = xeno_i2c_read(kbuf, len)) < 0) {
+			printk("I2C read error : %d\n", err);
+			return err;
 		} else {
-			if ((err = copy_to_user(buff, kbuf, BUFF_SIZE)) > 0) {
+			if ((err = copy_to_user(buff, kbuf, len)) > 0) {
 				printk("copy to user error : %d B not copied\n", err);
-				return -1;
+				return err;
 			}
-			return err_size;
 		}
 	}
 	else {
@@ -103,25 +100,24 @@ ssize_t pca9554_read(struct file *file, char __user *buff, size_t len,
 	return 0;
 }
 
-ssize_t pca9554_write(struct file *file, const char __user *buff, size_t len,
-		loff_t *off) {
-	int err;
-	char kbuf[len];
+ssize_t pca9554_write(struct file *file, const char __user *buff, size_t len, loff_t *off) {
+	int err, i;
+	char kbuf[len+1], tmpbuff[len];
+
 
 	if(pca9554_state == CONFIGURED) {
-		kbuf[0] = OUTPUT;
 
-		if ((err = xeno_i2c_write(kbuf, 1)) < 0) {
-			printk("I2C write config error : %d\n", err);
-			return err;
-		}
-
-		if ((err = copy_from_user(kbuf, buff, len)) > 0) {
+		if ((err = copy_from_user(tmpbuff, buff, len)) > 0) {
 			printk("copy from user error : %d B not copied\n", err);
 			return -1;
 		}
 
-		if ((err = xeno_i2c_write(kbuf, len)) < 0) {
+		kbuf[0] = OUTPUT;
+
+		for(i=0; i<len; i++)
+			kbuf[i+1] = tmpbuff[i];
+
+		if ((err = xeno_i2c_write(kbuf, len+1)) < 0) {
 			printk("I2C write error : %d\n", err);
 			return err;
 		}
@@ -144,7 +140,7 @@ int __init init_module(void) {
 
 	int err;
 
-	char buff[BUFF_SIZE];
+	char buff[2];
 
 	/* Enregistrement du driver */
 	dev_t dev;
@@ -164,14 +160,17 @@ int __init init_module(void) {
 
 	pca9554_state = INITIALIZED;
 
-	/* IO pins configuration */
-	xeno_i2c_ioctl(I2C_SLAVE, 0x0);
+	/* Configuration */
+	if ((err = xeno_i2c_ioctl(I2C_SLAVE, 0x20)) < 0) {
+		printk("I2C ioctl config error : %d\n", err);
+		return err;
+	}
 
 	buff[0] = CONFIG;
 	buff[1] = I2C_IO_MODES;
 
-	if ((err = xeno_i2c_write(buff, BUFF_SIZE)) < 0) {
-		printk("I2C io modes config error : %d\n", err);
+	if ((err = xeno_i2c_write(buff, 2)) < 0) {
+		printk("I2C IO pins config error : %d\n", err);
 		return err;
 	}
 
@@ -190,6 +189,8 @@ void __exit cleanup_module(void) {
 		if ((err = xeno_i2c_exit()) < 0) {
 			printk("I2C cleanup error : %d\n", err);
 		}
+
+		pca9554_state = DISABLED;
 	}
 }
 
