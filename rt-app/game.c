@@ -50,7 +50,7 @@ int game_init(void)
 	player[0].y = LCD_MAX_Y - 20;
 
 	// Création de la tâche gérant le rafraichissement de l'écran
-	err =  rt_task_create (&refresh_task, "menu", STACK_SIZE, 50, 0);
+	err =  rt_task_create (&refresh_task, "refresh", STACK_SIZE, 50, 0);
 	if (err != 0) {
 		printk("menu task creation failed: %d\n", err);
 		return -1;
@@ -64,7 +64,7 @@ int game_init(void)
 		return -1;
 	}
 
-
+	return 0;
 }
 
 // Défini une nouvelle vague d'ennemis
@@ -78,8 +78,8 @@ void ennemi_init(void)
 		ennemi[i].enable = 1;
 
 		// Réinitialise les positions
-		ennemi[i].x = (i % 6)*20;
-		ennemi[i].y = ((i / 6)+1)*20;
+		ennemi[i].x = ((i % 6)+1)*30;
+		ennemi[i].y = ((i / 6)+1)*30;
 	}
 }
 
@@ -89,6 +89,11 @@ void game_main(void)
 	{
 		printk("game_init() failed");
 		return;
+	}
+
+	while(1)
+	{
+		rt_task_wait_period(NULL);;
 	}
 
 
