@@ -50,7 +50,7 @@ int game_init(void)
 	ennemi_init();
 
 	player[0].enable = 1;
-	player[0].x = LCD_MAX_X/2;
+	player[0].x = LCD_MAX_X/2 - 8;
 	player[0].y = LCD_MAX_Y - 20;
 
 
@@ -109,10 +109,12 @@ void move_player(void * cookie)
 {
 
 	int err;
-	int EdgeX_left = 10;
-	int EdgeX_right = LCD_MAX_X -10;
+	int border = 15;
+	int EdgeX_left = border;
+	int EdgeX_right = LCD_MAX_X - border;
 	int touch = 0;
 	struct ts_sample touch_info;
+	int speed = 5;
 
 	// Configuration de la tâche périodique
 	if(TIMER_PERIODIC)
@@ -146,19 +148,19 @@ void move_player(void * cookie)
 				printk("x = %d, y = %d\n", touch_info.x, touch_info.y);
 				touch = 1;
 
+				if(touch_info.x > player[0].x)
+				{
+					if(player[0].x + 16 < EdgeX_right)
+						player[0].x += speed;
+				}
+				else
+				{
+					if(player[0].x > EdgeX_left)
+						player[0].x -= speed;
+				}
+
 				while(xeno_ts_read(&touch_info, 1, O_NONBLOCK) > 0);
 			}
-		}
-
-		if(touch_info.x > player[0].x)
-		{
-			if(player[0].x < EdgeX_right)
-				player[0].x++;
-		}
-		else
-		{
-			if(player[0].x > EdgeX_left)
-				player[0].x--;
 		}
 
 
