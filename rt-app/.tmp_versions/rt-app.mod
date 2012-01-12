@@ -1,2 +1,0 @@
-/home/redsuser/etudiant/failletaz/iem-space-invader/rt-app/rt-app.ko
-/home/redsuser/etudiant/failletaz/iem-space-invader/rt-app/xeno-i2c.o /home/redsuser/etudiant/failletaz/iem-space-invader/rt-app/xeno-ts.o /home/redsuser/etudiant/failletaz/iem-space-invader/rt-app/xeno-ts-lib.o /home/redsuser/etudiant/failletaz/iem-space-invader/rt-app/rt-app-m.o /home/redsuser/etudiant/failletaz/iem-space-invader/rt-app/lcdlib.o /home/redsuser/etudiant/failletaz/iem-space-invader/rt-app/menu.o
