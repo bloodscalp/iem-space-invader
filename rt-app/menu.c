@@ -34,8 +34,6 @@ void menu_display(char ** menu, const int nbMenu)
 
 	int i, j;
 
-
-
 	// Background Black
 	fb_rect_fill(0, LCD_MAX_Y-1, 0, LCD_MAX_X-1, 0);
 
@@ -127,28 +125,39 @@ void new_game(void)
 {
 	char *menu[3] = {"Easy", "Medium", "Hard"};
 
+
+	difficulty = 0;
+
 	// Affichage du menu
 	menu_display(menu, 3);
 
-	// Attend que l'utilisateur touche l'écran et lance la fonction
-	// correspondante à son choix
-	switch(menu_select())
-	{
-		case 0:	printk("Easy\n");
-				difficulty = 1;
-				break;
-		case 1: printk("Medium\n");
-				difficulty = 2;
-				break;
-		case 2: printk("Hard\n");
-				difficulty = 3;
-				break;
-		default:
-				printk("error menu_select\n");
-				break;
+	rt_task_wait_period(NULL);
+
+	while(difficulty == 0){
+
+		// Attend que l'utilisateur touche l'écran et lance la fonction
+		// correspondante à son choix
+		switch(menu_select())
+		{
+			case 0:	printk("Easy\n");
+					difficulty = 1;
+					break;
+			case 1: printk("Medium\n");
+					difficulty = 2;
+					break;
+			case 2: printk("Hard\n");
+					difficulty = 3;
+					break;
+			default:
+					printk("error menu_select\n");
+					break;
+		}
 	}
 
+	game_main();
+
 	rt_task_wait_period(NULL);
+
 
 }
 
