@@ -11,32 +11,34 @@
 #define nbEnnemis 24
 #define nbShotsMax 512
 
-struct t_ennemi {
+typedef struct t_ennemi {
+	int				enable;
 	int				x;
 	int				y;
 	unsigned int	pv;
-} ennemi[nbEnnemis];
+} t_ennemi_;
 
-struct t_player {
+typedef struct t_player {
 	int				enable;
 	int				x;
 	int				y;
 	unsigned int	lifes;
-} player[3];
+} t_player_;
 
-struct t_shot {
+typedef struct t_shot {
 	int		enable;
 	int		x;
 	int		y;
 	int		direction; // Up = -1, down = 1
-} shot[nbShotsMax];
+} t_shot_;
 
-unsigned int speed;
+extern t_ennemi_ ennemi[nbEnnemis];
+extern t_player_ player[3];
+extern t_shot_ shot[nbShotsMax];
+extern unsigned int difficulty;
 
-// 1 = easy, 2 = medium, 3 = hard
-unsigned int difficulty;
 
-unsigned int score;
-
+void game_main(void);
+void ennemi_init(void);
 
 #endif /* GAME_H_ */

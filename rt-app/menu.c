@@ -148,6 +148,8 @@ void new_game(void)
 				break;
 	}
 
+	game_main();
+
 	rt_task_wait_period(NULL);
 
 }
