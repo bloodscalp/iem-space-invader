@@ -46,6 +46,20 @@ int main(int argc, char **argv) {
 			hp_update_leds();
 		}
 
+		if(SW4_event) {
+			SW4_event = 0;
+
+			hp = 0;
+			hp_update_leds();
+		}
+
+		if(SW5_event) {
+			SW5_event = 0;
+
+			hp = 4;
+			hp_update_leds();
+		}
+
 	}
 
 	close(i2c_fd);
