@@ -37,6 +37,8 @@ unsigned int difficulty;
 
 unsigned int score;
 
+RT_MUTEX mutex_ennemi;
+
 RT_TASK move_task, shots_impacts_task, ennemi_task;
 #define PERIOD_TASK_MOVE 50
 

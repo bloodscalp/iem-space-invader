@@ -241,7 +241,7 @@ extern void refresh(void* cookie)
     		}
     	}
 
-
+    	/*
     	// POUR LES TESTS
     	for(k = 0; k < nbEnnemis; k++)
     	{
@@ -250,7 +250,7 @@ extern void refresh(void* cookie)
 				ennemi[k].x = (ennemi[k].x + 1) % (LCD_MAX_X - 16);
     		}
     	}
-
+*/
     	// TEST SCORE
     	if(test % 10 == 0)
     	{
