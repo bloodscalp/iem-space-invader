@@ -200,7 +200,8 @@ extern void refresh(void* cookie)
     	{
     		if(shot[k].enable == 1)
     		{
-    			buffer[shot[k].x + shot[k].y*LCD_MAX_X] = 0xFFFF;
+    			for(i = 0; i < 6; i++)
+    				buffer[shot[k].x + i%2 + (shot[k].y + i/2)*LCD_MAX_X] = 0xFFFF;
     		}
     	}
 
