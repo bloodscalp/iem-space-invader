@@ -111,7 +111,7 @@ extern void refresh(void* cookie)
     			}
     		}
 
-        	sprintf(buffer_string, "Level: %d  Score: %d", score, speed);
+        	sprintf(buffer_string, "Level: %d  Score: %d", speed, score);
         	fb_print_string(0xFFFF, BLUE(0x1F), buffer_string, 1, 1);
 
         	last_score = score;

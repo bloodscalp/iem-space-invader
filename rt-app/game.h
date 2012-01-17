@@ -66,12 +66,16 @@ void game_main(void);
 void init_ennemi_init(void);
 void move_player(void *cookie);
 void move_ennemi(void* cookie);
+void switch_events(void *cookie);
 void show_ennemi(void);
 bool detectShitEnable(void);
 
 extern RT_MUTEX mutex_ennemi;
 
 void shots_impacts(void * cookie);
+
+void check_switch_events_once(void);
+void hp_update_leds(void);
 
 
 #endif /* GAME_H_ */

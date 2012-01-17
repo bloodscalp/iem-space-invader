@@ -39,8 +39,13 @@ unsigned int score;
 
 RT_MUTEX mutex_ennemi;
 
-RT_TASK move_task, shots_impacts_task, ennemi_task;
+RT_TASK move_task, shots_impacts_task, ennemi_task, switch_events_task;
 #define PERIOD_TASK_MOVE 50
+
+int SW2_event, SW3_event, SW4_event, SW5_event;
+
+int err;
+int i2c_fd;
 
 int game_init(void) {
 	int err;
@@ -53,9 +58,9 @@ int game_init(void) {
 	player[0].lifes = 4;
 
 	// Création de la tâche gérant le rafraichissement de l'écran
-	err = rt_task_create(&refresh_task, "menu", STACK_SIZE, 50, 0);
+	err = rt_task_create(&refresh_task, "refresh", STACK_SIZE, 50, 0);
 	if (err != 0) {
-		printk("menu task creation failed: %d\n", err);
+		printk("refresh creation failed: %d\n", err);
 		return -1;
 	}
 
@@ -63,14 +68,14 @@ int game_init(void) {
 
 	err = rt_task_start(&refresh_task, refresh, 0);
 	if (err != 0) {
-		printk("menu task start failed: %d\n", err);
+		printk("refresh task start failed: %d\n", err);
 		return -1;
 	}
 
 	// Création de la tâche gérant le déplacement des vaisseaux ennemis
 	err = rt_task_create(&ennemi_task, "move_ennemi", STACK_SIZE, 50, 0);
 	if (err != 0) {
-		printk("menu task creation failed: %d\n", err);
+		printk("ennemi task creation failed: %d\n", err);
 		return -1;
 	}
 
@@ -78,12 +83,13 @@ int game_init(void) {
 
 	err = rt_task_start(&ennemi_task, move_ennemi, 0);
 	if (err != 0) {
-		printk("menu task start failed: %d\n", err);
+		printk("ennemi task start failed: %d\n", err);
 		return -1;
 	}
 
+
 	// Création de la tâche gérant les tirs et les impacts
-	err = rt_task_create(&shots_impacts, "shots_impacts", STACK_SIZE, 50, 0);
+	err =  rt_task_create (&shots_impacts_task, "shots_impacts", STACK_SIZE, 50, 0);
 	if (err != 0) {
 		printk("Shots & impacts task creation failed: %d\n", err);
 		return -1;
@@ -96,6 +102,23 @@ int game_init(void) {
 		printk("Shots & impacts task start failed: %d\n", err);
 		return -1;
 	}
+
+
+	// Création de la tâche gérant les switchs
+	err =  rt_task_create (&switch_events_task, "switch_events", STACK_SIZE, 50, 0);
+	if (err != 0) {
+		printk("Switch events task creation failed: %d\n", err);
+		return -1;
+	}
+
+	printk("Switch events task created\n");
+
+	err = rt_task_start(&switch_events_task, switch_events, 0);
+	if (err != 0) {
+		printk("Switch events task start failed: %d\n", err);
+		return -1;
+	}
+
 
 	rt_mutex_create(&mutex_ennemi, "mutex ennemi");
 
@@ -227,7 +250,7 @@ void move_ennemi(void* cookie) {
 		return;
 
 	// Test
-	show_ennemi();
+	//show_ennemi();
 	printk("*************************************************\n");
 	while (1) {
 
@@ -367,40 +390,7 @@ void move_ennemi(void* cookie) {
 
 }
 
-/**
- * Tâche gérant les mouvements des projectiles et les impacts de
- * ces derniers avec les vaisseaux
- */
-void shots_impacts(void * cookie) {
 
-	int err, i;
-
-	// Configuration de la tâche périodique
-	if (TIMER_PERIODIC) {
-		err = rt_task_set_periodic(&shots_impacts_task, TM_NOW,
-				PERIOD_TASK_MOVE);
-		if (err != 0) {
-			printk("Move task set periodic failed: %d\n", err);
-			return;
-		}
-
-	} else {
-		err = rt_task_set_periodic(&shots_impacts_task, TM_NOW,
-				PERIOD_TASK_MOVE * MS);
-		if (err != 0) {
-			printk("Move task set periodic failed: %d\n", err);
-			return;
-		}
-	}
-
-	while (1) {
-		rt_task_wait_period(NULL);
-
-		for (i = 0; i < nbShotsMax; i++) {
-			shot[i].y += shot[i].direction;
-		}
-	}
-}
 void move_player(void * cookie) {
 
 	int err;
@@ -459,6 +449,203 @@ void move_player(void * cookie) {
 	}
 
 }
+
+
+
+
+/**
+ * Tâche gérant les mouvements des projectiles et les impacts de
+ * ces derniers avec les vaisseaux
+ */
+void shots_impacts(void * cookie) {
+
+	int i;
+
+	// Configuration de la tâche périodique
+	if (TIMER_PERIODIC) {
+		err = rt_task_set_periodic(&shots_impacts_task, TM_NOW, PERIOD_TASK_MOVE);
+		if (err != 0) {
+			printk("Shots and impacts task set periodic failed: %d\n", err);
+			return;
+		}
+
+	} else {
+		err = rt_task_set_periodic(&shots_impacts_task, TM_NOW, PERIOD_TASK_MOVE * MS);
+		if (err != 0) {
+			printk("Shots and impacts task set periodic failed: %d\n", err);
+			return;
+		}
+	}
+
+	while (1) {
+		rt_task_wait_period(NULL);
+
+		/* Parcours la liste des tirs */
+		for(i=0; i<nbShotsMax; i++) {
+			/* Fait avancer/reculer le tir s'il est enabled */
+			shot[i].y += shot[i].direction*shot[i].enable;
+		}
+	}
+}
+
+
+void switch_events(void *cookie) {
+
+	int i;
+	int ctr;
+
+	// Configuration de la tâche périodique
+	if (TIMER_PERIODIC) {
+		err = rt_task_set_periodic(&switch_events_task, TM_NOW, PERIOD_TASK_MOVE);
+		if (err != 0) {
+			printk("Switch events task set periodic failed: %d\n", err);
+			return;
+		}
+
+	} else {
+		err = rt_task_set_periodic(&switch_events_task, TM_NOW, PERIOD_TASK_MOVE * MS);
+		if (err != 0) {
+			printk("Switch events task set periodic failed: %d\n", err);
+			return;
+		}
+	}
+
+	while(1) {
+		rt_task_wait_period(NULL);
+
+		i = 0;
+		ctr = 0;
+
+		check_switch_events_once();
+
+		/* This is a cheat :p */
+		if(SW5_event && SW3_event) {
+			SW5_event = 0;
+			SW3_event = 0;
+
+			player[0].lifes++;
+			hp_update_leds();
+
+		}
+
+
+		if(SW2_event) {
+			SW2_event = 0;
+
+			/* Parcours le tableau des tirs */
+			while(1) {
+				ctr++;
+
+				/* Si le tir courant est inactif */
+				if(shot[i].enable == 0) {
+					/* L'initialise et l'active */
+					shot[i].x = player[1].x;
+					shot[i].y = player[1].y;
+					shot[i].direction = -1; // Moves up
+					shot[i].enable = 1;
+					break;
+				} else {
+					/* Pase au tir suivant */
+					i = ((i+1) % nbShotsMax);
+
+					/* Si on a parcouru plus de 2 fois le tableau */
+					if(ctr > nbShotsMax*2)
+						/* Annule le tir pour éviter de planter les suivants */
+						break;
+				}
+			}
+		}
+
+		if(SW3_event) {
+			SW3_event = 0;
+
+			if(player[0].lifes < 4) {
+				player[0].lifes++;
+				hp_update_leds();
+			}
+		}
+
+		if(SW4_event) {
+			SW4_event = 0;
+
+			if(player[0].lifes > 0) {
+				player[0].lifes--;
+				hp_update_leds();
+			}
+		}
+	}
+}
+
+
+void check_switch_events_once() {
+
+	char buf[1];
+	char lastBuf[1];
+
+	char switch_change, switch_change_up;
+
+	if((err = read(i2c_fd, buf, 1)) < 0) {
+		printf("i2c read error : %d\n", err);
+	} else if(buf[0] != lastBuf[0]) {
+
+		switch_change = (buf[0] ^ lastBuf[0]) >> 4;
+		switch_change_up = switch_change & ~(buf[0] >> 4);
+
+		if(switch_change_up & 0x1) {
+			SW5_event = 1;
+		}
+
+		if(switch_change_up & 0x2) {
+			SW4_event = 1;
+		}
+
+		if(switch_change_up & 0x4) {
+			SW3_event = 1;
+		}
+
+		if(switch_change_up & 0x8) {
+			SW2_event = 1;
+		}
+
+		lastBuf[0] = buf[0];
+	}
+}
+
+void hp_update_leds() {
+
+	char buf[1];
+
+	/* Conversion int -> LEDS */
+	buf[0] = 0x0F << player[0].lifes;
+
+	/* Inversion des hp pour décrémentation depuis le haut */
+	switch(buf[0]) {
+	case 0x1:
+		buf[0] = 0x8;
+		break;
+
+	case 0x3:
+		buf[0] = 0xC;
+		break;
+
+	case 0x7:
+		buf[0] = 0xE;
+		break;
+	}
+
+	if((err = write(i2c_fd, buf, 1)) < 0) {
+		printf("i2c write error : %d\n", err);
+	}
+}
+
+
+void switch_init() {
+	mknod("/var/dev/i2c", S_IFCHR|S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH, makedev(10,0));
+
+	i2c_fd = open("/var/dev/i2c", O_RDWR);
+}
+
+
 
 void game_main(void) {
 	if (game_init() < 0) {
