@@ -38,7 +38,7 @@ unsigned int difficulty;
 unsigned int score;
 
 
-RT_TASK move_task, shots_impacts;
+RT_TASK move_task, shots_impacts_task;
 #define PERIOD_TASK_MOVE 50
 
 int game_init(void)
@@ -96,7 +96,7 @@ int game_init(void)
 
 	printk("Shots & impacts task created\n");
 
-	err = rt_task_start(&shots_impacts, shots_impacts, 0);
+	err = rt_task_start(&shots_impacts_task, shots_impacts, 0);
 	if (err != 0) {
 		printk("Shots & impacts task start failed: %d\n", err);
 		return -1;
@@ -197,19 +197,29 @@ void move_player(void * cookie)
  */
 void shots_impacts(void * cookie) {
 
+	int err, i;
+
 	// Configuration de la tâche périodique
 	if (TIMER_PERIODIC) {
-		err = rt_task_set_periodic(&shots_impacts, TM_NOW, PERIOD_TASK_MOVE);
+		err = rt_task_set_periodic(&shots_impacts_task, TM_NOW, PERIOD_TASK_MOVE);
 		if (err != 0) {
 			printk("Move task set periodic failed: %d\n", err);
 			return;
 		}
 
 	} else {
-		err = rt_task_set_periodic(&shots_impacts, TM_NOW, PERIOD_TASK_MOVE * MS);
+		err = rt_task_set_periodic(&shots_impacts_task, TM_NOW, PERIOD_TASK_MOVE * MS);
 		if (err != 0) {
 			printk("Move task set periodic failed: %d\n", err);
 			return;
+		}
+	}
+
+	while (1){
+		rt_task_wait_period(NULL);
+
+		for(i=0; i<nbShotsMax; i++) {
+			shot[i].y += shot[i].direction;
 		}
 	}
 }
