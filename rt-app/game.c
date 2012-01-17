@@ -72,6 +72,21 @@ int game_init(void) {
 		return -1;
 	}
 
+	// Création de la tâche gérant le rafraichissement de l'écran
+	err = rt_task_create(&move_task, "move_player", STACK_SIZE, 50, 0);
+	if (err != 0) {
+		printk("move player creation failed: %d\n", err);
+		return -1;
+	}
+
+	printk("Task created\n");
+
+	err = rt_task_start(&move_task, move_player, 0);
+	if (err != 0) {
+		printk("move player start failed: %d\n", err);
+		return -1;
+	}
+
 	// Création de la tâche gérant le déplacement des vaisseaux ennemis
 	err = rt_task_create(&ennemi_task, "move_ennemi", STACK_SIZE, 50, 0);
 	if (err != 0) {
@@ -585,7 +600,7 @@ void check_switch_events_once() {
 	char switch_change, switch_change_up;
 
 	if((err = read(i2c_fd, buf, 1)) < 0) {
-		printf("i2c read error : %d\n", err);
+		printk("i2c read error : %d\n", err);
 	} else if(buf[0] != lastBuf[0]) {
 
 		switch_change = (buf[0] ^ lastBuf[0]) >> 4;
@@ -634,7 +649,7 @@ void hp_update_leds() {
 	}
 
 	if((err = write(i2c_fd, buf, 1)) < 0) {
-		printf("i2c write error : %d\n", err);
+		printk("i2c write error : %d\n", err);
 	}
 }
 
