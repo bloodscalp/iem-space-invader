@@ -32,7 +32,6 @@ typedef enum {
 RT_TASK ennemi_task;
 
 #define PERIOD_TASK_REFRESH 40
-RT_TASK refresh_task;
 
 typedef struct t_ennemi {
 	int enable;
@@ -61,9 +60,12 @@ extern t_shot_ shot[nbShotsMax];
 extern unsigned int difficulty;
 
 void game_main(void);
-void ennemi_init(void);
+void init_ennemi_init(void);
 void move_player(void *cookie);
 void move_ennemi(void* cookie);
+void show_ennemi(void);
 bool detectShitEnable(void);
+
+extern RT_MUTEX mutex_ennemi;
 
 #endif /* GAME_H_ */
