@@ -69,6 +69,7 @@ extern void refresh(void* cookie)
 
 	int err;
 	int i, j, k;
+	//int test = 0;
 
 	// Configuration de la tâche périodique
 	if (TIMER_PERIODIC)
@@ -110,6 +111,40 @@ extern void refresh(void* cookie)
 					}
 				}
     		}
+    		else if(ennemi[k].enable == 2)
+    		{
+				for(i = 0; i < SHIP_SIZE; i++)
+				{
+					for(j = 0; j < SHIP_SIZE; j++)
+					{
+						buffer[ennemi[k].x + j + (ennemi[k].y + i)*LCD_MAX_X] = 0xFFFF;
+					}
+				}
+				ennemi[k].enable++;
+    		}
+    		else if(ennemi[k].enable == 3)
+    		{
+				for(i = 0; i < SHIP_SIZE; i++)
+				{
+					for(j = 0; j < SHIP_SIZE; j++)
+					{
+						buffer[ennemi[k].x + j + (ennemi[k].y + i)*LCD_MAX_X] = RED(0xFF) + GREEN(0xFF);
+					}
+				}
+				ennemi[k].enable++;
+    		}
+    		else if(ennemi[k].enable == 4)
+    		{
+				for(i = 0; i < SHIP_SIZE; i++)
+				{
+					for(j = 0; j < SHIP_SIZE; j++)
+					{
+						buffer[ennemi[k].x + j + (ennemi[k].y + i)*LCD_MAX_X] = RED(0xFF);
+					}
+				}
+				ennemi[k].enable = 0;
+    		}
+
     	}
 
     	// Affichage du joueur
@@ -124,6 +159,48 @@ extern void refresh(void* cookie)
 						buffer[player[k].x + j + (player[k].y + i)*LCD_MAX_X] = player_view[i][j];
 					}
 				}
+    		}
+    		else if(player[k].enable == 2)
+    		{
+				for(i = 0; i < SHIP_SIZE; i++)
+				{
+					for(j = 0; j < SHIP_SIZE; j++)
+					{
+						buffer[player[k].x + j + (player[k].y + i)*LCD_MAX_X] = 0xFFFF;
+					}
+				}
+				player[k].enable++;
+    		}
+    		else if(player[k].enable == 3)
+    		{
+				for(i = 0; i < SHIP_SIZE; i++)
+				{
+					for(j = 0; j < SHIP_SIZE; j++)
+					{
+						buffer[player[k].x + j + (player[k].y + i)*LCD_MAX_X] = RED(0xFF) + GREEN(0xFF);
+					}
+				}
+				player[k].enable++;
+    		}
+    		else if(player[k].enable == 4)
+    		{
+				for(i = 0; i < SHIP_SIZE; i++)
+				{
+					for(j = 0; j < SHIP_SIZE; j++)
+					{
+						buffer[player[k].x + j + (player[k].y + i)*LCD_MAX_X] = RED(0xFF);
+					}
+				}
+				player[k].enable = 0;
+    		}
+    	}
+
+    	// Affichage des shots en blanc
+    	for(k = 0; k < nbShotsMax; k++)
+    	{
+    		if(shot[k].enable == 1)
+    		{
+    			buffer[shot[k].x + shot[k].y*LCD_MAX_X] = 0xFFFF;
     		}
     	}
 
@@ -146,6 +223,14 @@ extern void refresh(void* cookie)
     	}
 
     	rt_task_wait_period(NULL);
+
+    	// POUR LES TEST DES EXPLOSIONS
+    	/*
+    	if(test < nbEnnemis)
+    	{
+    		ennemi[test++].enable = 2;
+    	}
+    	*/
 
     }
 
