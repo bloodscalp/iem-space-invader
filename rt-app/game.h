@@ -36,6 +36,9 @@ extern t_ennemi_ ennemi[nbEnnemis];
 extern t_player_ player[3];
 extern t_shot_ shot[nbShotsMax];
 extern unsigned int difficulty;
+extern unsigned int score;
+extern unsigned int speed;
+
 
 
 void game_main(void);

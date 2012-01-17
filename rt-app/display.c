@@ -69,7 +69,10 @@ extern void refresh(void* cookie)
 
 	int err;
 	int i, j, k;
-	//int test = 0;
+	int test = 0;
+	char buffer_string[64];
+	int last_score = 0xFF;
+	int last_level = 0xFF;
 
 	// Configuration de la tâche périodique
 	if (TIMER_PERIODIC)
@@ -90,7 +93,31 @@ extern void refresh(void* cookie)
 		}
 	}
 
+
+
     while (1){
+
+
+    	// Affiche une bande bleue en haut de l'écran avec le level et le score
+    	// à chaque fois que ces valeurs sont modifiées
+    	if((last_score != score) || (last_level != speed))
+		{
+
+    		for(i = 0; i < 10; i++)
+    		{
+    			for(j = 0; j < LCD_MAX_X; j++)
+    			{
+    				fb_set_pixel(i, j, 0xFF);
+    			}
+    		}
+
+        	sprintf(buffer_string, "Level: %d  Score: %d", score, speed);
+        	fb_print_string(0xFFFF, BLUE(0x1F), buffer_string, 1, 1);
+
+        	last_score = score;
+        	last_level = speed;
+		}
+
 
     	// Réinitialise le buffer en noir
     	for(i = 0; i < PIXELS; i++)
@@ -206,13 +233,14 @@ extern void refresh(void* cookie)
     	}
 
     	// Copie du buffer interne dans le frame buffer
-    	for(i = 0; i < LCD_MAX_Y; i++)
+    	for(i = 10; i < LCD_MAX_Y; i++)
     	{
     		for(j = 0; j < LCD_MAX_X; j++)
     		{
     			fb_set_pixel(i, j, buffer[j + i*LCD_MAX_X]);
     		}
     	}
+
 
     	// POUR LES TESTS
     	for(k = 0; k < nbEnnemis; k++)
@@ -222,6 +250,13 @@ extern void refresh(void* cookie)
 				ennemi[k].x = (ennemi[k].x + 1) % (LCD_MAX_X - 16);
     		}
     	}
+
+    	// TEST SCORE
+    	if(test % 10 == 0)
+    	{
+    		score++;
+    	}
+    	test++;
 
     	rt_task_wait_period(NULL);
 
