@@ -37,14 +37,18 @@ unsigned int difficulty;
 
 unsigned int score;
 
+RT_TASK move_task, shots_impacts_task, ennemi_task;
+#define PERIOD_TASK_MOVE 50
+
 int game_init(void) {
 	int err;
 
 	speed++;
 
 	player[0].enable = 1;
-	player[0].x = LCD_MAX_X / 2;
+	player[0].x = LCD_MAX_X / 2 - 8;
 	player[0].y = LCD_MAX_Y - 20;
+	player[0].lifes = 4;
 
 	// Création de la tâche gérant le rafraichissement de l'écran
 	err = rt_task_create(&refresh_task, "menu", STACK_SIZE, 50, 0);
@@ -62,7 +66,7 @@ int game_init(void) {
 	}
 
 	// Création de la tâche gérant le déplacement des vaisseaux ennemis
-	err =  rt_task_create (&ennemi_task, "move_ennemi", STACK_SIZE, 50, 0);
+	err = rt_task_create(&ennemi_task, "move_ennemi", STACK_SIZE, 50, 0);
 	if (err != 0) {
 		printk("menu task creation failed: %d\n", err);
 		return -1;
@@ -76,8 +80,25 @@ int game_init(void) {
 		return -1;
 	}
 
+	// Création de la tâche gérant les tirs et les impacts
+	err = rt_task_create(&shots_impacts, "shots_impacts", STACK_SIZE, 50, 0);
+	if (err != 0) {
+		printk("Shots & impacts task creation failed: %d\n", err);
+		return -1;
+	}
+
+	printk("Shots & impacts task created\n");
+
+	err = rt_task_start(&shots_impacts_task, shots_impacts, 0);
+	if (err != 0) {
+		printk("Shots & impacts task start failed: %d\n", err);
+		return -1;
+	}
+
+	rt_mutex_create(&mutex_ennemi, "mutex ennemi");
 
 	return 0;
+
 }
 
 /*
@@ -102,12 +123,14 @@ int ennemi_init(void) {
 	int nbEnnemiParVague;
 
 	// position de dÃ©part de la vague d'ennemis
-    if(nbEnnemis%nbVagueEnnemis != 0 ){
-        printk("Le nombre de vaisseaux par vague n'est pas conforme\n");
-        return -1;
-    }
+	if (nbEnnemis % nbVagueEnnemis != 0) {
+		printk("Le nombre de vaisseaux par vague n'est pas conforme\n");
+		return -1;
+	}
 
-    nbEnnemiParVague = nbEnnemis / nbVagueEnnemis;
+	nbEnnemiParVague = nbEnnemis / nbVagueEnnemis;
+
+	rt_mutex_lock(&mutex_ennemi, TM_INFINITE);
 
 	// initialisation vaisseaux ennemis
 	for (i = 0; i < nbVagueEnnemis; i++) {
@@ -125,21 +148,22 @@ int ennemi_init(void) {
 					* DEFAULT_PV_ENNEMI;
 		}
 	}
+	rt_mutex_unlock(&mutex_ennemi);
 	return 0;
 
 }
 
-void show_ennemi(void){
+void show_ennemi(void) {
 	int i, j;
 	// position de dÃ©part de la vague d'ennemis
 
 	int nbEnnemiParVague = nbEnnemis / nbVagueEnnemis;
 
-    for (j = 0; j < nbEnnemiParVague; j++) {
-			// Active tous les ennemis
-			printk("X\tY\tPV\ten\t\t");
-   }
-   printk("\n");
+	for (j = 0; j < nbEnnemiParVague; j++) {
+		// Active tous les ennemis
+		printk("X\tY\tPV\ten\t\t");
+	}
+	printk("\n");
 	// initialisation vaisseaux ennemis
 	for (i = 0; i < nbVagueEnnemis; i++) {
 
@@ -153,7 +177,7 @@ void show_ennemi(void){
 
 		}
 		printk("\n");
-    }
+	}
 }
 
 // Défini une nouvelle vague d'ennemis
@@ -163,20 +187,24 @@ void move_ennemi(void* cookie) {
 	int direction;
 	int yFirstEnnemi = yStart;
 	int err;
+	int border = 15;
+	int EdgeX_left = border;
+	int EdgeX_right = LCD_MAX_X - border;
+	int touch = 0;
+	struct ts_sample touch_info;
+	int speed = 5;
 
 	// Configuration de la tâche périodique
-	if (TIMER_PERIODIC)
-	{
+	if (TIMER_PERIODIC) {
 		err = rt_task_set_periodic(&ennemi_task, TM_NOW, PERIOD_TASK_ENNEMI);
 		if (err != 0) {
 			printk("Ennemi task set periodic failed: %d\n", err);
 			return;
 		}
 
-	}
-	else
-	{
-		err = rt_task_set_periodic(&ennemi_task, TM_NOW, PERIOD_TASK_ENNEMI*MS);
+	} else {
+		err = rt_task_set_periodic(&ennemi_task, TM_NOW, PERIOD_TASK_ENNEMI
+				* MS);
 		if (err != 0) {
 			printk("Ennemi task set periodic failed: %d\n", err);
 			return;
@@ -185,24 +213,25 @@ void move_ennemi(void* cookie) {
 
 	// Variable active lorsque qu'il y a (ou doit avoir) un changement
 	// de direction des vaisseaux ennemis
-	bool directionChanged = false;
+	bool directionChanged;
+	directionChanged = false;
 
 	printk("*************************************************\n");
-    printk("Init ennemi\n");
-    printk("*************************************************\n");
+	printk("Init ennemi\n");
+	printk("*************************************************\n");
 
-    //initialisation des vaisseaux ennemis
-	if(ennemi_init() < 0)
-       return;
+	//initialisation des vaisseaux ennemis
+	if (ennemi_init() < 0)
+		return;
 
-    // Test
-    show_ennemi();
-    printk("*************************************************\n");
-    while(1){
+	// Test
+	show_ennemi();
+	printk("*************************************************\n");
+	while (1) {
 
-        direction = DIRECTION_EST;
+		direction = DIRECTION_EST;
 
-        while (detectShitEnable()) {
+		while (detectShitEnable()) {
 
 			// Position dernier vaisseaux en x
 			int xLastEnnemi;
@@ -228,10 +257,10 @@ void move_ennemi(void* cookie) {
 
 				}
 				// dÃ©tection vaisseaux touchent le bord Ã  l'est
-				if ( xLastEnnemi + SHIT_SIZE > EDGE_EAST - STEP_MOVE_ENNEMI){
+				if (xLastEnnemi + SHIT_SIZE > EDGE_EAST - STEP_MOVE_ENNEMI) {
 					direction = DIRECTION_OUEST;
 					directionChanged = true;
-					yFirstEnnemi+=Y_SPACE;
+					yFirstEnnemi += Y_SPACE;
 				}
 
 			} else {
@@ -243,10 +272,10 @@ void move_ennemi(void* cookie) {
 					}
 				}
 				// dÃ©tection vaisseaux touchent le bord Ã  l'est
-				if ( ( EDGE_WEST + STEP_MOVE_ENNEMI) > xLastEnnemi  ) { //&& (xLastEnnemi <= EDGE_WEST)
+				if ((EDGE_WEST + STEP_MOVE_ENNEMI) > xLastEnnemi) { //&& (xLastEnnemi <= EDGE_WEST)
 					direction = DIRECTION_EST;
-				    yFirstEnnemi+=Y_SPACE;
-                	directionChanged = true;
+					yFirstEnnemi += Y_SPACE;
+					directionChanged = true;
 				}
 			}
 
@@ -269,20 +298,19 @@ void move_ennemi(void* cookie) {
 
 			/****************************************************************/
 
-            /*
-             * Test : affiche si la direction doit changer (est <-> ouest)
+			/*
+			 * Test : affiche si la direction doit changer (est <-> ouest)
 			 */
-            if( directionChanged ){
-                printk("changement de direction : oui\n");
-            }else{
-                printk("changement de direction : non\n");
-            }
+			if (directionChanged) {
+				printk("changement de direction : oui\n");
+			} else {
+				printk("changement de direction : non\n");
+			}
 
+			printk("xLastEnnemi : %i\n", xLastEnnemi);
+			printk("yLastEnnemi : %i\n", yLastEnnemi);
 
-            printk("xLastEnnemi : %i\n", xLastEnnemi);
-            printk("yLastEnnemi : %i\n", yLastEnnemi);
-
-            printk("*************************************************\n");
+			printk("*************************************************\n");
 
 			/****************************************************************/
 
@@ -293,14 +321,19 @@ void move_ennemi(void* cookie) {
 			 *
 			 */
 
+			rt_mutex_lock(&mutex_ennemi, TM_INFINITE);
+
 			for (i = 0; i < nbEnnemis; i++) {
 				if (directionChanged) {
 					ennemi[i].y += STEP_MOVE_ENNEMI;
 
-				}else{
+				} else {
 					ennemi[i].x += STEP_MOVE_ENNEMI * direction;
 				}
 			}
+
+			rt_mutex_unlock(&mutex_ennemi);
+
 			directionChanged = false;
 
 			/****************************************************************/
@@ -311,30 +344,119 @@ void move_ennemi(void* cookie) {
 			 *
 			 */
 
-   	         for (i = 0; i < nbEnnemis; i++) {
-			     if ( ennemi[i].pv == 0 ){
-			        ennemi[i].enable = 0;
-                 }
-             }
-             /****************************************************************/
-   	    	rt_task_wait_period(NULL);
+			for (i = 0; i < nbEnnemis; i++) {
+				if (ennemi[i].pv == 0) {
+					ennemi[i].enable = 0;
+				}
+			}
+			/****************************************************************/
+			rt_task_wait_period(NULL);
 		}
 
 		// tous les vaisseaux ennemis ont Ã©tÃ© dÃ©truit : nouveau niveau !
 		printk("Vaisseaux ennemis abattus\n");
 		printk("new level\n");
 
-        difficulty++;
+		difficulty++;
 
-        ennemi_init();
+		ennemi_init();
 
-    }
-
-
-
+	}
 
 }
 
+/**
+ * Tâche gérant les mouvements des projectiles et les impacts de
+ * ces derniers avec les vaisseaux
+ */
+void shots_impacts(void * cookie) {
+
+	int err, i;
+
+	// Configuration de la tâche périodique
+	if (TIMER_PERIODIC) {
+		err = rt_task_set_periodic(&shots_impacts_task, TM_NOW,
+				PERIOD_TASK_MOVE);
+		if (err != 0) {
+			printk("Move task set periodic failed: %d\n", err);
+			return;
+		}
+
+	} else {
+		err = rt_task_set_periodic(&shots_impacts_task, TM_NOW,
+				PERIOD_TASK_MOVE * MS);
+		if (err != 0) {
+			printk("Move task set periodic failed: %d\n", err);
+			return;
+		}
+	}
+
+	while (1) {
+		rt_task_wait_period(NULL);
+
+		for (i = 0; i < nbShotsMax; i++) {
+			shot[i].y += shot[i].direction;
+		}
+	}
+}
+void move_player(void * cookie) {
+
+	int err;
+	int border = 15;
+	int EdgeX_left = border;
+	int EdgeX_right = LCD_MAX_X - border;
+	int touch = 0;
+	struct ts_sample touch_info;
+	int speed = 5;
+
+	// Configuration de la tâche périodique
+	if (TIMER_PERIODIC) {
+		err = rt_task_set_periodic(&move_task, TM_NOW, PERIOD_TASK_MOVE);
+		if (err != 0) {
+			printk("Move task set periodic failed: %d\n", err);
+			return;
+		}
+
+	} else {
+		err = rt_task_set_periodic(&move_task, TM_NOW, PERIOD_TASK_MOVE * MS);
+		if (err != 0) {
+			printk("Move task set periodic failed: %d\n", err);
+			return;
+		}
+	}
+
+	while (1) {
+
+		// Attend que l'utilisateur touche l'écran
+		while (touch == 0) {
+			rt_task_wait_period(NULL);
+
+			if (xeno_ts_read(&touch_info, 1, O_NONBLOCK) > 0) {
+				printk("x = %d, y = %d\n", touch_info.x, touch_info.y);
+				touch = 1;
+
+				if (touch_info.x > player[0].x) {
+					if (player[0].x + 16 < EdgeX_right)
+						player[0].x += speed;
+				} else {
+					if (player[0].x > EdgeX_left)
+						player[0].x -= speed;
+				}
+
+				while (xeno_ts_read(&touch_info, 1, O_NONBLOCK) > 0)
+					;
+			}
+		}
+
+		printk("x_player = %d \n", player[0].x);
+
+		rt_task_wait_period(NULL);
+
+		touch = 0;
+
+	}
+
+}
 
 void game_main(void) {
 	if (game_init() < 0) {
@@ -342,4 +464,7 @@ void game_main(void) {
 		return;
 	}
 
+	while (player[0].lifes > 0) {
+		rt_task_wait_period(NULL);
+	}
 }

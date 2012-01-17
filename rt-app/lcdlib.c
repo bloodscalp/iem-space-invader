@@ -49,7 +49,7 @@ unsigned int get_random(void) {
   return Xn;
 }
 
-void fb_set_pixel(int y, int x, int couleur) {
+void inline fb_set_pixel(int y, int x, int couleur) {
   *((unsigned short int*)(fb_mem + 2*x + y*480)) = couleur;
 }
 

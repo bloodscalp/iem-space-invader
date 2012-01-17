@@ -29,7 +29,7 @@ typedef enum {
 #define STEP_MOVE_ENNEMI 4
 
 #define PERIOD_TASK_ENNEMI 40
-RT_TASK ennemi_task;
+
 
 #define PERIOD_TASK_REFRESH 40
 
@@ -67,5 +67,8 @@ void show_ennemi(void);
 bool detectShitEnable(void);
 
 extern RT_MUTEX mutex_ennemi;
+
+void shots_impacts(void * cookie);
+
 
 #endif /* GAME_H_ */
