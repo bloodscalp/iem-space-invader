@@ -52,6 +52,7 @@ int game_init(void)
 	player[0].enable = 1;
 	player[0].x = LCD_MAX_X/2 - 8;
 	player[0].y = LCD_MAX_Y - 20;
+	player[0].lifes = 4;
 
 
 	// Création de la tâche gérant le rafraichissement de l'écran
@@ -226,7 +227,7 @@ void game_main(void)
 
 
 
-	while(player[0].enable == 1){
+	while(player[0].lifes > 0){
 		rt_task_wait_period(NULL);
 	}
 }
