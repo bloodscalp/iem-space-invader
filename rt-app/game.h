@@ -13,8 +13,8 @@
 #define nbVagueEnnemis 4
 #define DIRECTION_EST 1
 #define DIRECTION_OUEST -1
-#define EDGE_EAST LCD_MAX_X
-#define EDGE_WEST 0
+#define EDGE_EAST LCD_MAX_X-4
+#define EDGE_WEST 4
 #define SHIT_SIZE 16
 #define DEFAULT_PV_ENNEMI 20
 #define X_SPACE 4
