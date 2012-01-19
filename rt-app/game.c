@@ -297,7 +297,7 @@ void move_ennemi(void* cookie) {
 
 				}
 				// dÃ©tection vaisseaux touchent le bord Ã  l'est
-				if (xLastEnnemi + SHIT_SIZE > EDGE_EAST - STEP_MOVE_ENNEMI) {
+				if (xLastEnnemi + SHIT_SIZE > EDGE_EAST - speed) {
 					direction = DIRECTION_OUEST;
 					directionChanged = true;
 					yFirstEnnemi += Y_SPACE;
@@ -312,7 +312,7 @@ void move_ennemi(void* cookie) {
 					}
 				}
 				// dÃ©tection vaisseaux touchent le bord Ã  l'est
-				if ((EDGE_WEST + STEP_MOVE_ENNEMI) > xLastEnnemi) { //&& (xLastEnnemi <= EDGE_WEST)
+				if ((EDGE_WEST + speed) > xLastEnnemi) { //&& (xLastEnnemi <= EDGE_WEST)
 					direction = DIRECTION_EST;
 					yFirstEnnemi += Y_SPACE;
 					directionChanged = true;
@@ -365,10 +365,10 @@ void move_ennemi(void* cookie) {
 
 			for (i = 0; i < nbEnnemis; i++) {
 				if (directionChanged) {
-					ennemi[i].y += STEP_MOVE_ENNEMI;
+					ennemi[i].y += speed;
 
 				} else {
-					ennemi[i].x += STEP_MOVE_ENNEMI * direction;
+					ennemi[i].x += speed * direction;
 				}
 			}
 
@@ -386,7 +386,7 @@ void move_ennemi(void* cookie) {
 
 			for (i = 0; i < nbEnnemis; i++) {
 				if (ennemi[i].pv == 0) {
-					ennemi[i].enable = 0;
+					ennemi[i].enable = 2;
 				}
 			}
 			/****************************************************************/
@@ -397,7 +397,7 @@ void move_ennemi(void* cookie) {
 		printk("Vaisseaux ennemis abattus\n");
 		printk("new level\n");
 
-		difficulty++;
+		speed++;
 
 		ennemi_init();
 
