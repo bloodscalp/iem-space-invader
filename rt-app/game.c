@@ -24,6 +24,7 @@
 #include "lcdlib.h"
 #include "display.h"
 #include "ennemi.h"
+#include "switchs.h"
 
 
 
@@ -119,9 +120,8 @@ int game_init(void) {
 		return -1;
 	}
 
-	switchs_init();
-
-
+	if(switchs_init() < 0)
+		return -1;
 
 	rt_mutex_create(&mutex_ennemi, "mutex ennemi");
 
@@ -280,17 +280,17 @@ void hp_update_leds() {
 
 	/* Inversion des hp pour décrémentation depuis le haut */
 	switch(buf[0]) {
-	case 0x1:
-		buf[0] = 0x8;
-		break;
+		case 0x1:
+			buf[0] = 0x8;
+			break;
 
-	case 0x3:
-		buf[0] = 0xC;
-		break;
+		case 0x3:
+			buf[0] = 0xC;
+			break;
 
-	case 0x7:
-		buf[0] = 0xE;
-		break;
+		case 0x7:
+			buf[0] = 0xE;
+			break;
 	}
 
 	if((err = write(i2c_fd, buf, 1)) < 0) {

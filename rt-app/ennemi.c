@@ -30,7 +30,7 @@
  * Fonction qui retourne "true" s'il existe encore
  * un vaisseau ennemi en vie
  */
-bool detectShitEnable(void) {
+bool detectShipEnable(void) {
 	int i;
 	// Test s'il existe encore un vaisseau ennemi
 	for (i = 0; i < nbEnnemis; i++) {
@@ -64,9 +64,9 @@ int ennemi_init(void) {
 			// Active tous les ennemis
 			ennemi[i * nbEnnemiParVague + j].enable = 1;
 			// RÃ©initialise les positions
-			ennemi[i * nbEnnemiParVague + j].x = xStart + (j * (SHIT_SIZE
+			ennemi[i * nbEnnemiParVague + j].x = xStart + (j * (SHIP_SIZE
 					+ X_SPACE));
-			ennemi[i * nbEnnemiParVague + j].y = yStart + (i * (SHIT_SIZE
+			ennemi[i * nbEnnemiParVague + j].y = yStart + (i * (SHIP_SIZE
 					+ Y_SPACE));
 			// Initialise le nombre de point de vie selon la difficultÃ©
 			ennemi[i * nbEnnemiParVague + j].pv = difficulty
@@ -152,7 +152,7 @@ void move_ennemi(void* cookie) {
 
 		direction = DIRECTION_EST;
 
-		while (detectShitEnable()) {
+		while (detectShipEnable()) {
 
 			// Position dernier vaisseaux en x
 			int xLastEnnemi;
@@ -178,7 +178,7 @@ void move_ennemi(void* cookie) {
 
 				}
 				// dÃ©tection vaisseaux touchent le bord Ã  l'est
-				if (xLastEnnemi + SHIT_SIZE > EDGE_EAST - speed) {
+				if (xLastEnnemi + SHIP_SIZE > EDGE_EAST - speed) {
 					direction = DIRECTION_OUEST;
 					directionChanged = true;
 					yFirstEnnemi += Y_SPACE;

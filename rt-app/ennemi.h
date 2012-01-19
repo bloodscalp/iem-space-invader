@@ -12,8 +12,8 @@
 #define nbVagueEnnemis 4
 #define DIRECTION_EST 1
 #define DIRECTION_OUEST -1
-#define SHIT_SIZE 16
-#define DEFAULT_PV_ENNEMI 20
+#define SHIP_SIZE 16
+#define DEFAULT_PV_ENNEMI 1
 #define X_SPACE 4
 #define Y_SPACE 4
 #define xStart 10
@@ -26,7 +26,7 @@ extern t_ennemi_ ennemi[nbEnnemis];
 
 extern int ennemi_init(void);
 extern void move_ennemi(void* cookie);
-bool detectShitEnable(void);
+bool detectShipEnable(void);
 void show_ennemi(void);
 
 #endif /* ENNEMI_H_ */
