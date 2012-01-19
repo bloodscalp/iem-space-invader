@@ -55,6 +55,7 @@ extern t_shot_ shot[nbShotsMax];
 extern unsigned int difficulty;
 extern unsigned int score;
 extern unsigned int speed;
+extern unsigned int highScore[10];
 
 
 void game_main(void);
@@ -64,6 +65,7 @@ void move_ennemi(void* cookie);
 void switch_events(void *cookie);
 void show_ennemi(void);
 bool detectShitEnable(void);
+void tri_score(void);
 
 extern RT_MUTEX mutex_ennemi;
 

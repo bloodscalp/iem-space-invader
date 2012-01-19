@@ -22,10 +22,9 @@ const int WinSizeX = 130;
 const int Ystart = 40;
 const int Xstart = 15;
 int Xaffichage = 15;
-const int nbMenu = 3;
 int espacement = 15;
 
-void menu_display(char ** menu, const int nbMenu)
+void menu_display(char ** menu, const int nbMenu, char* title)
 {
 
 	int Xaffichage = Xstart;
@@ -37,7 +36,7 @@ void menu_display(char ** menu, const int nbMenu)
 	// Background Black
 	fb_rect_fill(0, LCD_MAX_Y-1, 0, LCD_MAX_X-1, 0);
 
-	fb_print_string(0xFFFF, 0, "SPACE INVADERS", 60, 15);
+	fb_print_string(0xFFFF, 0, title, 60, 15);
 
 	// Affichage du menu
 	for(i = 0; i < nbMenu; i++)
@@ -59,7 +58,7 @@ void menu_display(char ** menu, const int nbMenu)
 }
 
 
-int menu_select(void)
+int menu_select(int nbMenu)
 {
 	int err;
 	int touch = 0;
@@ -124,12 +123,13 @@ int menu_select(void)
 void new_game(void)
 {
 	char *menu[3] = {"Easy", "Medium", "Hard"};
+	char *titre = "DIFFICULTY";
 
 
 	difficulty = 0;
 
 	// Affichage du menu
-	menu_display(menu, 3);
+	menu_display(menu, 3, titre);
 
 	rt_task_wait_period(NULL);
 
@@ -137,7 +137,7 @@ void new_game(void)
 
 		// Attend que l'utilisateur touche l'écran et lance la fonction
 		// correspondante à son choix
-		switch(menu_select())
+		switch(menu_select(3))
 		{
 			case 0:	printk("Easy\n");
 					difficulty = 1;
@@ -162,25 +162,92 @@ void new_game(void)
 }
 
 
+void top10(void)
+{
+	char *menu[1] = {"Return to main menu"};
+	char *titre = "HIGH SCORES";
+
+	int retour = 0;
+	int i;
+	int x = Xstart;
+	int y = Ystart + WinSizeY + 10;
+
+	int sizeWinNo = 18;
+
+	char affichage[64];
+
+	// Affichage du menu
+	menu_display(menu, 1, titre);
+
+	// Affichage des scores
+	for(i = 0; i < 10; i++)
+	{
+		// Affichage du Numéro du score
+		fb_rect_fill(y, y+sizeWinNo, x+1, x + sizeWinNo, 0xFFFF);
+		sprintf(affichage, "%d", i+1);
+		fb_print_string(0, 0xFFFF, affichage, x + 6, y + 6);
+
+		// Affichage du scores
+		sprintf(affichage, "%d", highScore[i]);
+		fb_print_string(RED(0x1F), 0, affichage, x + sizeWinNo + 6, y + 6);
+
+		y += sizeWinNo + 3;
+
+	}
+
+
+	while(retour == 0){
+
+		// Attend que l'utilisateur touche l'écran et lance la fonction
+		// correspondante à son choix
+		switch(menu_select(1))
+		{
+			case 0:	retour = 1;
+					break;
+			default:
+					printk("error menu_select\n");
+					break;
+		}
+
+	}
+
+	return;
+
+
+
+
+}
+
+
 void menu(void* cookie)
 {
 	char *menu[3] = {"New Game", "Top 10", "About"};
+	char *titre = "SPACE INVADERS";
+
+	// Reset des highscores au démarrage
+	int i;
+	for(i = 0; i < 10; i++)
+	{
+		highScore[i] = 0;
+	}
+
 
 	printk("Start menu\n");
 
 	while(1){
 
 		// Affichage du menu
-		menu_display(menu, 3);
+		menu_display(menu, 3, titre);
 
 		// Attend que l'utilisateur touche l'écran et lance la fonction
 		// correspondante à son choix
-		switch(menu_select())
+		switch(menu_select(3))
 		{
 			case 0:	printk("new_game()\n");
 					new_game();
 					break;
 			case 1: printk("top10()\n");
+					top10();
 					break;
 			case 2: printk("About()\n");
 					break;

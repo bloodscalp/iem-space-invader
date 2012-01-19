@@ -36,6 +36,7 @@ unsigned int speed;
 unsigned int difficulty;
 
 unsigned int score;
+unsigned int highScore[10];
 
 RT_MUTEX mutex_ennemi;
 
@@ -118,7 +119,7 @@ int game_init(void) {
 		return -1;
 	}
 
-	switchs_init();
+	// switchs_init();
 
 
 
@@ -515,14 +516,27 @@ void hp_update_leds() {
 		break;
 	}
 
-	if((err = write(i2c_fd, buf, 1)) < 0) {
-		printk("i2c write error : %d\n", err);
-	}
+	//if((err = write(i2c_fd, buf, 1)) < 0) {
+	//	printk("i2c write error : %d\n", err);
+	//}
 }
 
+void tri_score(){
 
+	int i;
+	int temp;
 
+	for(i = 0; i < 10; i++)
+	{
+		if(score > highScore[i])
+		{
+			temp = highScore[i];
+			highScore[i] = score;
+			score = temp;
+		}
+	}
 
+}
 
 
 void game_main(void) {
@@ -534,4 +548,7 @@ void game_main(void) {
 	while (player[0].lifes > 0) {
 		rt_task_wait_period(NULL);
 	}
+
+	tri_score();
+
 }

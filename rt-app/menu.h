@@ -10,5 +10,8 @@
 
 extern RT_TASK menu_task;
 
-int menu_select(void);
+int menu_select(int nbMenu);
+void new_game(void);
+void top10(void);
+
 extern void menu(void* cookie);
