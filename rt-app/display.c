@@ -19,6 +19,7 @@
 #include "xeno-ts.h"
 #include "menu.h"
 #include "game.h"
+#include "ennemi.h"
 
 #define PERIOD_TASK_REFRESH 40
 #define PIXELS 		LCD_MAX_X*LCD_MAX_Y

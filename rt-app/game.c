@@ -25,7 +25,7 @@
 #include "display.h"
 #include "ennemi.h"
 
-t_ennemi_ ennemi[nbEnnemis];
+
 
 t_player_ player[3];
 
