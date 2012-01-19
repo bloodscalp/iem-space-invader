@@ -474,7 +474,7 @@ void move_player(void * cookie) {
  */
 void shots_impacts(void * cookie) {
 
-	int i;
+	int i, j;
 
 	// Configuration de la tâche périodique
 	if (TIMER_PERIODIC) {
@@ -497,8 +497,47 @@ void shots_impacts(void * cookie) {
 
 		/* Parcours la liste des tirs */
 		for(i=0; i<nbShotsMax; i++) {
-			/* Fait avancer/reculer le tir s'il est enabled */
-			shot[i].y += shot[i].direction*shot[i].enable;
+			if(shot[i].enable == 1)
+			{
+				/* Fait avancer/reculer le tir s'il est enabled */
+				shot[i].y += shot[i].direction;
+
+				// Si le shot est à la hauteur du joueur
+				if(shot[i].y > (LCD_MAX_Y-20))
+				{
+					for(j = 0; j < 3; j++)
+					{
+						if(player[j].enable == 1)
+						{
+							// S'il y a une collision avec le joueur
+							if((shot[i].x > player[j].x) && (shot[i].x < (player[j].x + 16)))
+							{
+								printk("Player touched\n");
+								player[j].enable++;
+								shot[i].enable = 0;
+							}
+						}
+					}
+				}
+				// Si le shot est dans la zone ennemis
+				else
+				{
+					for(j = 0; j < nbEnnemis; j++)
+					{
+						if(ennemi[j].enable == 1)
+						{
+							// S'il y a une collision avec un ennemi
+							if( (shot[i].x > ennemi[j].x) && (shot[i].x < (ennemi[j].x + 16))
+							 && (shot[i].y > ennemi[j].y) && (shot[i].y < (ennemi[j].y + 16)) )
+							{
+								printk("Ennemi n°%d touched\n", i);
+								ennemi[j].pv--;
+								shot[i].enable = 0;
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 }

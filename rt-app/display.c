@@ -187,6 +187,7 @@ extern void refresh(void* cookie)
 					}
 				}
     		}
+    		// Explosion du joueur
     		else if(player[k].enable == 2)
     		{
 				for(i = 0; i < SHIP_SIZE; i++)
@@ -219,6 +220,7 @@ extern void refresh(void* cookie)
 					}
 				}
 				player[k].enable = 0;
+				player[k].lifes--;
     		}
     	}
 
