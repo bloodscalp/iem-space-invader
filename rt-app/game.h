@@ -26,12 +26,7 @@ typedef enum {
 	false = 0, true = 1
 } bool;
 
-#define STEP_MOVE_ENNEMI 4
 
-#define PERIOD_TASK_ENNEMI 40
-
-
-#define PERIOD_TASK_REFRESH 40
 
 typedef struct t_ennemi {
 	int enable;
@@ -74,7 +69,7 @@ extern RT_MUTEX mutex_ennemi;
 
 void shots_impacts(void * cookie);
 
-void check_switch_events_once(void);
+
 void hp_update_leds(void);
 
 
