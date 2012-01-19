@@ -6,15 +6,15 @@
  */
 
 #include <native/task.h>
-#include <native/intr.h>
-#include <native/event.h>
-#include <native/alarm.h>
-#include <native/timer.h>
 
 #include "pca9554-m.h"
 #include "rt-app-m.h"
 
+
+RT_TASK switch_events_task;
+
 int switchs_init() {
+
 	// Création de la tâche gérant les switchs
 	err =  rt_task_create (&switch_events_task, "switch_events", STACK_SIZE, 50, 0);
 	if (err != 0) {
@@ -29,6 +29,7 @@ int switchs_init() {
 		printk("Switch events task start failed: %d\n", err);
 		return -1;
 	}
+	return 0;
 }
 
 /*
@@ -39,12 +40,12 @@ void i2c_module_init() {
 }
 */
 
-void switch_events(void *cookie) {
+void switch_events_handler(void *cookie) {
 
 	int i;
 	int ctr;
 
-	// Configuration de la tâche périodique
+	/* Configuration de la tâche périodique */
 	if (TIMER_PERIODIC) {
 		err = rt_task_set_periodic(&switch_events_task, TM_NOW, PERIOD_TASK_SWITCHS);
 		if (err != 0) {
@@ -66,6 +67,7 @@ void switch_events(void *cookie) {
 		i = 0;
 		ctr = 0;
 
+		/* Vérifie l'état des switchs */
 		check_switch_events_once();
 
 		/* This is a cheat :p */
@@ -78,7 +80,7 @@ void switch_events(void *cookie) {
 
 		}
 
-
+		/* Nouveau tir */
 		if(SW2_event) {
 			SW2_event = 0;
 
@@ -134,13 +136,17 @@ void check_switch_events_once() {
 
 	char switch_change, switch_change_up;
 
-	if((err = read(i2c_fd, buf, 1)) < 0) {
+	/* Lis la valeur des switchs */
+	if((err = pca9554_read(NULL, buf, 1)) < 0) {
 		printk("i2c read error : %d\n", err);
 	} else if(buf[0] != lastBuf[0]) {
 
+		/* Analyse s'il y a eu un changement (rise) */
 		switch_change = (buf[0] ^ lastBuf[0]) >> 4;
 		switch_change_up = switch_change & ~(buf[0] >> 4);
 
+
+		/* Met à jour les event flags selon les switchs */
 		if(switch_change_up & 0x1) {
 			SW5_event = 1;
 		}
@@ -157,6 +163,7 @@ void check_switch_events_once() {
 			SW2_event = 1;
 		}
 
+		/* Mémorise l'état présent */
 		lastBuf[0] = buf[0];
 	}
 }

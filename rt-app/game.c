@@ -40,8 +40,7 @@ unsigned int difficulty;
 unsigned int score;
 
 
-
-RT_TASK move_task, shots_impacts_task, switch_events_task;
+RT_TASK move_task, shots_impacts_task;
 #define PERIOD_TASK_MOVE 50
 
 
@@ -120,12 +119,20 @@ int game_init(void) {
 		return -1;
 	}
 
+
+	/* Initialisation de l'interface i2c */
+	if(pca9554_init() < 0)
+		return -1;
+
+	/* Initialisation des switchs */
 	if(switchs_init() < 0)
 		return -1;
+
 
 	rt_mutex_create(&mutex_ennemi, "mutex ennemi");
 
 	return 0;
+
 
 }
 
@@ -274,9 +281,16 @@ void shots_impacts(void * cookie) {
 void hp_update_leds() {
 
 	char buf[1];
+	int hp = player[0].lifes;
+
+	if(hp < 0)
+		hp = 0;
+	else if(hp < MAX_HP)
+		hp = MAX_HP;
+
 
 	/* Conversion int -> LEDS */
-	buf[0] = 0x0F << player[0].lifes;
+	buf[0] = 0x0F << hp;
 
 	/* Inversion des hp pour décrémentation depuis le haut */
 	switch(buf[0]) {
@@ -293,7 +307,7 @@ void hp_update_leds() {
 			break;
 	}
 
-	if((err = write(i2c_fd, buf, 1)) < 0) {
+	if((err = pca9554_write(NULL, buf, 1, 0)) < 0) {
 		printk("i2c write error : %d\n", err);
 	}
 }
