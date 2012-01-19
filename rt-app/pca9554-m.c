@@ -108,7 +108,7 @@ ssize_t pca9554_read(struct file *file, char __user *buff, size_t len, loff_t *o
 	return 0;
 }
 
-ssize_t pca9554_mod_write(struct file *file, const char __user *buff, size_t len, loff_t *off) {
+ssize_t pca9554_write(struct file *file, const char __user *buff, size_t len, loff_t *off) {
 	int err, i;
 	char kbuf[len+1], tmpbuff[len];
 

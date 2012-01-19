@@ -8,8 +8,6 @@
 #ifndef DISPLAY_H_
 #define DISPLAY_H_
 
-extern RT_TASK refresh_task;
-
 extern void refresh(void* cookie);
 
 #endif /* DISPLAY_H_ */

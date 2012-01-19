@@ -221,7 +221,7 @@ void move_ennemi(void* cookie) {
 
 			/*
 			 * Test : affiche si la direction doit changer (est <-> ouest)
-			 */
+
 			if (directionChanged) {
 				printk("changement de direction : oui\n");
 			} else {
@@ -232,7 +232,7 @@ void move_ennemi(void* cookie) {
 			printk("yLastEnnemi : %i\n", yLastEnnemi);
 
 			printk("*************************************************\n");
-
+ */
 			/****************************************************************/
 
 			/* Deplacement vaisseaux ennemis

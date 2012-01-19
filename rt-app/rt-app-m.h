@@ -16,6 +16,17 @@
 #define PERIOD_TASK_ENNEMI 	40
 #define PERIOD_TASK_REFRESH 40
 
+#define nbEnnemis 24
+#define nbVagueEnnemis 4
+#define DIRECTION_EST 1
+#define DIRECTION_OUEST -1
+#define SHIP_SIZE 16
+#define DEFAULT_PV_ENNEMI 1
+#define X_SPACE 4
+#define Y_SPACE 4
+#define xStart 10
+#define yStart 10
+
 #define STEP_MOVE_ENNEMI 4
 
 #define NB_MAX_SHOTS 256

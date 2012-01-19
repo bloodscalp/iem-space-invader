@@ -12,6 +12,12 @@
 #define EDGE_EAST LCD_MAX_X-4
 #define EDGE_WEST 4
 
+#include <native/task.h>
+#include <native/intr.h>
+#include <native/event.h>
+#include <native/alarm.h>
+#include <native/timer.h>
+#include <native/mutex.h>
 
 typedef enum {
 	false = 0, true = 1
@@ -40,7 +46,7 @@ typedef struct t_shot {
 	int direction; // Up = -1, down = 1
 } t_shot_;
 
-
+extern t_ennemi_ ennemi[nbEnnemis];
 extern t_player_ player[3];
 extern t_shot_ shot[nbShotsMax];
 extern unsigned int difficulty;
@@ -53,12 +59,14 @@ void game_main(void);
 void init_ennemi_init(void);
 void move_player(void *cookie);
 void move_ennemi(void* cookie);
-void switch_events(void *cookie);
 void show_ennemi(void);
 bool detectShitEnable(void);
 void tri_score(void);
 
 extern RT_MUTEX mutex_ennemi;
+extern RT_TASK move_task, ennemi_task, shots_impacts_task, switch_events_task, refresh_task;
+
+
 
 void shots_impacts(void * cookie);
 

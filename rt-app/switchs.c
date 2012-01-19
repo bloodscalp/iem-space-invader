@@ -9,28 +9,10 @@
 
 #include "pca9554-m.h"
 #include "rt-app-m.h"
+#include "game.h"
+#include "switchs.h"
 
-
-RT_TASK switch_events_task;
-
-int switchs_init() {
-
-	// Création de la tâche gérant les switchs
-	err =  rt_task_create (&switch_events_task, "switch_events", STACK_SIZE, 50, 0);
-	if (err != 0) {
-		printk("Switch events task creation failed: %d\n", err);
-		return -1;
-	}
-
-	printk("Switch events task created\n");
-
-	err = rt_task_start(&switch_events_task, switch_events, 0);
-	if (err != 0) {
-		printk("Switch events task start failed: %d\n", err);
-		return -1;
-	}
-	return 0;
-}
+int SW2_event, SW3_event, SW4_event, SW5_event;
 
 /*
 void i2c_module_init() {
@@ -44,6 +26,7 @@ void switch_events_handler(void *cookie) {
 
 	int i;
 	int ctr;
+	int err;
 
 	/* Configuration de la tâche périodique */
 	if (TIMER_PERIODIC) {
@@ -129,15 +112,16 @@ void switch_events_handler(void *cookie) {
 }
 
 
-void check_switch_events_once() {
+void check_switch_events_once(void) {
 
 	char buf[1];
 	char lastBuf[1];
+	int err;
 
 	char switch_change, switch_change_up;
 
 	/* Lis la valeur des switchs */
-	if((err = pca9554_read(NULL, buf, 1)) < 0) {
+	if((err = pca9554_read(NULL, buf, 1, NULL)) < 0) {
 		printk("i2c read error : %d\n", err);
 	} else if(buf[0] != lastBuf[0]) {
 

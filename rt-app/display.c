@@ -25,8 +25,6 @@
 #define PIXELS 		LCD_MAX_X*LCD_MAX_Y
 #define SHIP_SIZE	16
 
-RT_TASK refresh_task;
-
 unsigned short buffer[PIXELS];
 
 unsigned short ennemi_view[SHIP_SIZE][SHIP_SIZE] =

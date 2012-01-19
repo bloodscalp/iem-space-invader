@@ -7,7 +7,7 @@
 
 #include <linux/module.h>
 
-#include <native/task.h>
+
 #include <native/intr.h>
 #include <native/event.h>
 #include <native/alarm.h>
@@ -32,6 +32,8 @@ t_player_ player[3];
 
 t_shot_ shot[nbShotsMax];
 
+t_ennemi_ ennemi[nbEnnemis];
+
 unsigned int speed;
 
 // 1 = easy, 2 = medium, 3 = hard
@@ -40,8 +42,9 @@ unsigned int difficulty;
 unsigned int score;
 unsigned int highScore[10];
 
+RT_MUTEX mutex_ennemi;
+RT_TASK move_task, ennemi_task, shots_impacts_task, switch_events_task, refresh_task;
 
-RT_TASK move_task, shots_impacts_task;
 #define PERIOD_TASK_MOVE 50
 
 
@@ -125,11 +128,27 @@ int game_init(void) {
 	if(pca9554_init() < 0)
 		return -1;
 
-	/* Initialisation des switchs */
+	/* Initialisation des switchs
 	if(switchs_init() < 0)
 		return -1;
 
 
+	// Création de la tâche gérant les switchs
+	err =  rt_task_create (&switch_events_task, "switch_events", STACK_SIZE, 50, 0);
+	if (err != 0) {
+		printk("Switch events task creation failed: %d\n", err);
+		return -1;
+	}
+
+	printk("Switch events task created\n");
+
+	err = rt_task_start(&switch_events_task, switch_events_handler, 0);
+	if (err != 0) {
+		printk("Switch events task start failed: %d\n", err);
+		return -1;
+	}
+
+ */
 	rt_mutex_create(&mutex_ennemi, "mutex ennemi");
 
 	return 0;
@@ -137,6 +156,12 @@ int game_init(void) {
 
 }
 
+
+int switchs_init(void) {
+
+
+	return 0;
+}
 
 
 
@@ -309,7 +334,7 @@ void hp_update_leds() {
 	}
 
 
-	if((err = pca9554_write(NULL, buf, 1, 0)) < 0) {
+	if((err = pca9554_write(NULL, buf, 1, NULL)) < 0) {
 		printk("i2c write error : %d\n", err);
 	}
 }
