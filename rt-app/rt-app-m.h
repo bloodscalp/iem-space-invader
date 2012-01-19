@@ -20,6 +20,8 @@
 
 #define NB_MAX_SHOTS 256
 
+#define MAX_HP 4
+
 void __exit cleanup_module(void);
 
 #endif /* __RT_APP_M_H__ */
