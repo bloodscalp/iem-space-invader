@@ -74,9 +74,9 @@ void switch_events_handler(void *cookie) {
 				/* Si le tir courant est inactif */
 				if(shot[i].enable == 0) {
 					/* L'initialise et l'active */
-					shot[i].x = player[1].x;
+					shot[i].x = player[1].x + SHIP_SIZE/2;
 					shot[i].y = player[1].y;
-					shot[i].direction = -1; // Moves up
+					shot[i].direction = DIRECTION_UP; // Moves up
 					shot[i].enable = 1;
 					break;
 				} else {
