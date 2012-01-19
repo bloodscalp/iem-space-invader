@@ -15,4 +15,6 @@ int switchs_init();
 void switch_events_handler(void *cookie);
 void check_switch_events_once(void);
 
+int switchs_init(void);
+
 #endif /* SWITCHS_H_ */

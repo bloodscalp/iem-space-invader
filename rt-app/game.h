@@ -8,19 +8,10 @@
 #ifndef GAME_H_
 #define GAME_H_
 
-#define nbEnnemis 24		// doit être un multiple du nombre de vagues ennemies
 #define nbShotsMax 512
-#define nbVagueEnnemis 4
-#define DIRECTION_EST 1
-#define DIRECTION_OUEST -1
 #define EDGE_EAST LCD_MAX_X-4
 #define EDGE_WEST 4
-#define SHIT_SIZE 16
-#define DEFAULT_PV_ENNEMI 20
-#define X_SPACE 4
-#define Y_SPACE 4
-#define xStart 10
-#define yStart 10
+
 
 typedef enum {
 	false = 0, true = 1
@@ -49,7 +40,7 @@ typedef struct t_shot {
 	int direction; // Up = -1, down = 1
 } t_shot_;
 
-extern t_ennemi_ ennemi[nbEnnemis];
+
 extern t_player_ player[3];
 extern t_shot_ shot[nbShotsMax];
 extern unsigned int difficulty;
