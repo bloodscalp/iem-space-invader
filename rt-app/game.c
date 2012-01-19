@@ -270,7 +270,7 @@ void shots_impacts(void * cookie) {
 
 
 
-
+// Actualise l'état des leds en fonction du nombre de vies du joueur
 void hp_update_leds() {
 
 	char buf[1];
@@ -298,12 +298,47 @@ void hp_update_leds() {
 	}
 }
 
+// Supprime toutes les tâches créées par game_init
+int end_game(void)
+{
+	err = rt_task_delete(&refresh_task);
+	if (err != 0) {
+		printk("delete refresh task failed: %d\n", err);
+		return -1;
+	}
 
+	err = rt_task_delete(&move_task);
+	if (err != 0) {
+		printk("delete move task failed: %d\n", err);
+		return -1;
+	}
 
+	err = rt_task_delete(&ennemi_task);
+	if (err != 0) {
+		printk("delete move task failed: %d\n", err);
+		return -1;
+	}
+
+	err = rt_task_delete(&shots_impacts_task);
+	if (err != 0) {
+		printk("delete shots_impacts task failed: %d\n", err);
+		return -1;
+	}
+
+	err = rt_task_delete(&switch_events_task);
+	if (err != 0) {
+		printk("delete switch_events task failed: %d\n", err);
+		return -1;
+	}
+
+	return 0;
+
+}
 
 
 
 void game_main(void) {
+
 	if (game_init() < 0) {
 		printk("game_init() failed");
 		return;
@@ -312,4 +347,10 @@ void game_main(void) {
 	while (player[0].lifes > 0) {
 		rt_task_wait_period(NULL);
 	}
+
+	if (end_game() < 0) {
+		printk("end_game() failed");
+		return;
+	}
+
 }
