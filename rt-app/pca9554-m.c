@@ -58,20 +58,19 @@ int pca9554_close(struct inode *inode, struct file *file) {
 	return 0;
 }
 
-int pca9554_ioctl(struct inode * inode, struct file *file, unsigned int cmd,
-		unsigned long arg) {
+int pca9554_ioctl(struct inode * inode, struct file *file, unsigned int cmd, unsigned long arg) {
+
 	int err;
 	if ((err = xeno_i2c_ioctl(cmd, arg)) < 0) {
 		printk("I2C ioctl error : %d\n", err);
 		return err;
 	}
-
 	return 0;
 }
 
 ssize_t pca9554_read(struct file *file, char __user *buff, size_t len, loff_t *off) {
 
-	int err;
+	int i, err;
 	char kbuf[len];
 
 	if(pca9554_state == CONFIGURED) {
@@ -86,9 +85,18 @@ ssize_t pca9554_read(struct file *file, char __user *buff, size_t len, loff_t *o
 			printk("I2C read error : %d\n", err);
 			return err;
 		} else {
-			if ((err = copy_to_user(buff, kbuf, len)) > 0) {
-				printk("copy to user error : %d B not copied\n", err);
-				return err;
+
+			/* Si read est appelée depuis le noyau */
+			if(file == NULL) {
+				for(i=0; i<len; i++) {
+					buff[i] = kbuf[i];
+				}
+			/* Si read est appelée depuis le userspace */
+			} else {
+				if ((err = copy_to_user(buff, kbuf, len)) > 0) {
+					printk("copy to user error : %d B not copied\n", err);
+					return err;
+				}
 			}
 		}
 	}
@@ -100,16 +108,24 @@ ssize_t pca9554_read(struct file *file, char __user *buff, size_t len, loff_t *o
 	return 0;
 }
 
-ssize_t pca9554_write(struct file *file, const char __user *buff, size_t len, loff_t *off) {
+ssize_t pca9554_mod_write(struct file *file, const char __user *buff, size_t len, loff_t *off) {
 	int err, i;
 	char kbuf[len+1], tmpbuff[len];
 
 
 	if(pca9554_state == CONFIGURED) {
 
-		if ((err = copy_from_user(tmpbuff, buff, len)) > 0) {
-			printk("copy from user error : %d B not copied\n", err);
-			return -1;
+		/* Si read est appelée depuis le noyau */
+		if(file == NULL) {
+			for(i=0; i<len; i++) {
+				kbuf[i+1] = buff[i];
+			}
+		/* Si read est appelée depuis le userspace */
+		} else {
+			if ((err = copy_from_user(tmpbuff, buff, len)) > 0) {
+				printk("copy from user error : %d B not copied\n", err);
+				return -1;
+			}
 		}
 
 		kbuf[0] = OUTPUT;
@@ -134,13 +150,8 @@ ssize_t pca9554_write(struct file *file, const char __user *buff, size_t len, lo
  *  major 89  I2C bus interface
  *		  0 = /dev/i2c-0	First I2C adapter
  *		  1 = /dev/i2c-1	Second I2C adapter
- *
  */
 int __init init_module(void) {
-
-	int err;
-
-	char buff[2];
 
 	/* Enregistrement du driver */
 	dev_t dev;
@@ -151,6 +162,14 @@ int __init init_module(void) {
 
 	i2c_dev->owner = THIS_MODULE;
 	cdev_add(i2c_dev, dev, 1);
+
+	return pca9554_init();
+}
+
+int pca9554_init() {
+
+	int err;
+	char buff[2];
 
 	/* Initialisation du périphérique i2c */
 	if ((err = xeno_i2c_init()) < 0) {
@@ -193,5 +212,10 @@ void __exit cleanup_module(void) {
 		pca9554_state = DISABLED;
 	}
 }
+
+EXPORT_SYMBOL(pca9554_init);
+EXPORT_SYMBOL(pca9554_read);
+EXPORT_SYMBOL(pca9554_write);
+EXPORT_SYMBOL(pca9554_ioctl);
 
 MODULE_LICENSE("GPL");

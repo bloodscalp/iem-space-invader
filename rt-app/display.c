@@ -19,6 +19,7 @@
 #include "xeno-ts.h"
 #include "menu.h"
 #include "game.h"
+#include "ennemi.h"
 
 #define PERIOD_TASK_REFRESH 40
 #define PIXELS 		LCD_MAX_X*LCD_MAX_Y
@@ -187,6 +188,7 @@ extern void refresh(void* cookie)
 					}
 				}
     		}
+    		// Explosion du joueur
     		else if(player[k].enable == 2)
     		{
 				for(i = 0; i < SHIP_SIZE; i++)
@@ -219,6 +221,7 @@ extern void refresh(void* cookie)
 					}
 				}
 				player[k].enable = 0;
+				player[k].lifes--;
     		}
     	}
 
