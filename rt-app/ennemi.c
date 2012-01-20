@@ -44,7 +44,7 @@ bool detectShipEnable(void) {
 int ennemi_init(void) {
 
 	int i, j;
-	int nbEnnemiParVague;
+	//int nbEnnemiParVague;
 
 	// position de dÃ©part de la vague d'ennemis
 	if (nbEnnemis % nbVagueEnnemis != 0) {
@@ -52,7 +52,7 @@ int ennemi_init(void) {
 		return -1;
 	}
 
-	nbEnnemiParVague = nbEnnemis / nbVagueEnnemis;
+	//nbEnnemiParVague = nbEnnemis / nbVagueEnnemis;
 
 	rt_mutex_lock(&mutex_ennemi, TM_INFINITE);
 
@@ -63,12 +63,13 @@ int ennemi_init(void) {
 			// Active tous les ennemis
 			ennemi[i * nbEnnemiParVague + j].enable = 1;
 			// RÃ©initialise les positions
-			ennemi[i * nbEnnemiParVague + j].x = xStart
-					+ (j * (SHIP_SIZE + X_SPACE));
-			ennemi[i * nbEnnemiParVague + j].y = yStart
-					+ (i * (SHIP_SIZE + Y_SPACE));
+			ennemi[i * nbEnnemiParVague + j].x = xStart + (j * (SHIP_SIZE
+					+ X_SPACE));
+			ennemi[i * nbEnnemiParVague + j].y = yStart + (i * (SHIP_SIZE
+					+ Y_SPACE));
 			// Initialise le nombre de point de vie selon la difficultÃ©
-			ennemi[i * nbEnnemiParVague + j].pv = difficulty * DEFAULT_PV_ENNEMI;
+			ennemi[i * nbEnnemiParVague + j].pv = difficulty
+					* DEFAULT_PV_ENNEMI;
 		}
 	}
 	rt_mutex_unlock(&mutex_ennemi);
@@ -78,9 +79,6 @@ int ennemi_init(void) {
 
 void show_ennemi(void) {
 	int i, j;
-	// position de dÃ©part de la vague d'ennemis
-
-	int nbEnnemiParVague = nbEnnemis / nbVagueEnnemis;
 
 	for (j = 0; j < nbEnnemiParVague; j++) {
 		// Active tous les ennemis
@@ -122,8 +120,8 @@ void move_ennemi(void* cookie) {
 		}
 
 	} else {
-		err = rt_task_set_periodic(&ennemi_task, TM_NOW,
-				PERIOD_TASK_ENNEMI * MS);
+		err = rt_task_set_periodic(&ennemi_task, TM_NOW, PERIOD_TASK_ENNEMI
+				* MS);
 		if (err != 0) {
 			printk("Ennemi task set periodic failed: %d\n", err);
 			return;
@@ -170,8 +168,7 @@ void move_ennemi(void* cookie) {
 				xLastEnnemi = 0;
 				// detection du vaisseau le plus Ã  l'est
 				for (i = 0; i < nbEnnemis; i++) {
-					if ((ennemi[i].x > xLastEnnemi)
-							&& (ennemi[i].enable == 1)) {
+					if ((ennemi[i].x > xLastEnnemi) && (ennemi[i].enable == 1)) {
 						xLastEnnemi = ennemi[i].x;
 					}
 
@@ -187,8 +184,7 @@ void move_ennemi(void* cookie) {
 				xLastEnnemi = EDGE_EAST;
 				// detection du vaisseau le plus Ã  l'ouest
 				for (i = 0; i < nbEnnemis; i++) {
-					if ((ennemi[i].x < xLastEnnemi)
-							&& (ennemi[i].enable == 1)) {
+					if ((ennemi[i].x < xLastEnnemi) && (ennemi[i].enable == 1)) {
 						xLastEnnemi = ennemi[i].x;
 					}
 				}
@@ -286,26 +282,26 @@ void move_ennemi(void* cookie) {
 
 }
 
-void ennemi_pos_y (void) {
-	int i, j;
-	// position de dÃ©part de la vague d'ennemis
+// Met a jour la valeur des vaisseaux les plus en bas de l ecran
+// dans le tableau ennemi_y_tab[nbEnnemiParVague]
+void ennemi_pos_y(void) {
 
-	int nbEnnemiParVague = nbEnnemis / nbVagueEnnemis;
+	int i, j;
 
 	// Initialisation de la liste des ennemis
 	for (i = 0; i < nbEnnemiParVague; i++)
 		ennemi_y_tab[i].y = EDGE_NORTH;
-
 
 	// initialisation vaisseaux ennemis
 	for (i = 0; i < nbVagueEnnemis; i++) {
 
 		for (j = 0; j < nbEnnemiParVague; j++) {
 
-			if(ennemi_y_tab[j].y < ennemi[i * nbEnnemiParVague + j].y){
-				ennemi_y_tab[j].y = ennemi[i * nbEnnemiParVague + j].y;
-				ennemi_y_tab[j].x = ennemi[i * nbEnnemiParVague + j].x;
-			}
+			if (ennemi[i * nbEnnemiParVague + j].enable == 1)
+				if (ennemi_y_tab[j].y < ennemi[i * nbEnnemiParVague + j].y) {
+					ennemi_y_tab[j].y = ennemi[i * nbEnnemiParVague + j].y;
+					ennemi_y_tab[j].x = ennemi[i * nbEnnemiParVague + j].x;
+				}
 		}
 	}
 

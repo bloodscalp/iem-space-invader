@@ -19,11 +19,13 @@
 
 #define nbEnnemis 24
 #define nbVagueEnnemis 4
+#define nbEnnemiParVague (nbEnnemis/nbVagueEnnemis)
 #define DIRECTION_EST 1
 #define DIRECTION_OUEST -1
 #define DIRECTION_UP -1
 #define DIRECTION_DOWN 1
 #define SHIP_SIZE 16
+#define MISSILE_SIZE 2
 #define DEFAULT_PV_ENNEMI 1
 #define MOVE_MISSILE 1
 #define X_SPACE 4

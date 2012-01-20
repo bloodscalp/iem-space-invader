@@ -14,7 +14,8 @@
 
 void missile_ennemi(void *cookie) {
 
-	int i, j;
+	int i;
+	int j = 0;
 	int ctr;
 	int err;
 	int nbRandom = 0;
@@ -67,8 +68,8 @@ void missile_ennemi(void *cookie) {
 			j++;
 		}
 
-
 		// Désactive le missile si celui-ci touche le bas de l ecran
+		// TODO : doit etre desactive lorsque celui-ci touche un joueur
 		for (i = 0; i < nbShotsMax; j++) {
 			if (shot_ennemi[i].y >= EDGE_SOUTH - MISSILE_SIZE)
 				shot_ennemi[i].enable = 0;
