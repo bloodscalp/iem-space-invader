@@ -294,7 +294,7 @@ void ennemi_pos_y (void) {
 
 	// Initialisation de la liste des ennemis
 	for (i = 0; i < nbEnnemiParVague; i++)
-		ennemi_y_tab[i] = EDGE_NORTH;
+		ennemi_y_tab[i].y = EDGE_NORTH;
 
 
 	// initialisation vaisseaux ennemis
@@ -302,8 +302,10 @@ void ennemi_pos_y (void) {
 
 		for (j = 0; j < nbEnnemiParVague; j++) {
 
-			if(ennemi_y_tab[j] < ennemi[i * nbEnnemiParVague + j].y)
-				ennemi_y_tab[j] = ennemi[i * nbEnnemiParVague + j].y;
+			if(ennemi_y_tab[j].y < ennemi[i * nbEnnemiParVague + j].y){
+				ennemi_y_tab[j].y = ennemi[i * nbEnnemiParVague + j].y;
+				ennemi_y_tab[j].x = ennemi[i * nbEnnemiParVague + j].x;
+			}
 		}
 	}
 

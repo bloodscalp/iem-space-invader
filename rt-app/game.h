@@ -25,8 +25,6 @@ typedef enum {
 	false = 0, true = 1
 } bool;
 
-
-
 typedef struct t_ennemi {
 	int enable;
 	int x;
@@ -49,10 +47,11 @@ typedef struct t_shot {
 } t_shot_;
 
 extern t_ennemi_ ennemi[nbEnnemis];
+extern t_ennemi_ ennemi_y_tab[nbEnnemis/nbVagueEnnemis];
 extern t_player_ player[3];
 extern t_shot_ shot[nbShotsMax];
 extern t_shot_ shot_ennemi[nbShotsMax];
-extern ennemi_y_tab[nbEnnemis/nbVagueEnnemis];
+
 extern unsigned int difficulty;
 extern unsigned int score;
 extern unsigned int speed;
@@ -68,7 +67,7 @@ bool detectShitEnable(void);
 void tri_score(void);
 
 extern RT_MUTEX mutex_ennemi;
-extern RT_TASK move_task, ennemi_task, shots_impacts_task, switch_events_task, refresh_task;
+extern RT_TASK move_task, ennemi_task, shots_impacts_task, switch_events_task, refresh_task, missile_ennemi_task;
 
 
 

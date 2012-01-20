@@ -12,9 +12,9 @@
 #include "game.h"
 #include "missileEnnemi.h"
 
-void missile_ennemi_handler(void *cookie) {
+void missile_ennemi(void *cookie) {
 
-	int i;
+	int i, j;
 	int ctr;
 	int err;
 	int nbRandom = 0;
@@ -22,17 +22,17 @@ void missile_ennemi_handler(void *cookie) {
 	/* Configuration de la tâche périodique */
 	if (TIMER_PERIODIC) {
 		err = rt_task_set_periodic(&missile_ennemi_task, TM_NOW,
-				PERIOD_TASK_SWITCHS);
+				PERIOD_TASK_MISSILE_ENNEMI);
 		if (err != 0) {
-			printk("Switch events task set periodic failed: %d\n", err);
+			printk("Missile ennemi events task set periodic failed: %d\n", err);
 			return;
 		}
 
 	} else {
 		err = rt_task_set_periodic(&missile_ennemi_task, TM_NOW,
-				PERIOD_TASK_SWITCHS * MS);
+				PERIOD_TASK_MISSILE_ENNEMI * MS);
 		if (err != 0) {
-			printk("Switch events task set periodic failed: %d\n", err);
+			printk("Missile ennemi events task set periodic failed: %d\n", err);
 			return;
 		}
 	}
@@ -42,9 +42,9 @@ void missile_ennemi_handler(void *cookie) {
 
 	while (1) {
 
-		for (i = 0; i < nbShotsMax; j++) {
+		for (i = 0; i < nbShotsMax; i++) {
 			if (shot_ennemi[i].enable = 0)
-				// Place disponible
+				// Place disponible dans le tableau
 				exit;
 		}
 
@@ -59,13 +59,14 @@ void missile_ennemi_handler(void *cookie) {
 			// Tir un missile seulement si un vaisseau est present sur la colonne
 			// definie par le chiffre aleatoire
 			if (ennemi_y_tab[nbRandom].y != EDGE_NORTH) {
-				shot_ennemi[i].x = ennemi_y_tab[nbRandom].x + SHIP_SIZE / 2;
-				shot_ennemi[i].y = ennemi_y_tab[nbRandom].y + SHIP_SIZE;
-				shot_ennemi[i].enable = 1;
-				shot_ennemi[i].direction = DIRECTION_DOWN;
+				shot_ennemi[j].x = ennemi_y_tab[nbRandom].x + SHIP_SIZE / 2;
+				shot_ennemi[j].y = ennemi_y_tab[nbRandom].y + SHIP_SIZE;
+				shot_ennemi[j].enable = 1;
+				shot_ennemi[j].direction = DIRECTION_DOWN;
 			}
+			j++;
 		}
-		i++;
+
 
 		// Désactive le missile si celui-ci touche le bas de l ecran
 		for (i = 0; i < nbShotsMax; j++) {

@@ -8,7 +8,6 @@
 #ifndef MISSILEENNEMI_H_
 #define MISSILEENNEMI_H_
 
-extern void missile_ennemi_handler(void *cookie);
-void check_missile_ennemi_once(void);
+extern void missile_ennemi(void *cookie);
 
 #endif /* MISSILEENNEMI_H_ */
