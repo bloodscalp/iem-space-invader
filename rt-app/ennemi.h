@@ -12,6 +12,7 @@
 
 extern int ennemi_init(void);
 extern void move_ennemi(void* cookie);
+extern int* ennemi_pos_y (void);
 bool detectShipEnable(void);
 void show_ennemi(void);
 
