@@ -11,12 +11,14 @@
 #include "rt-app-m.h"
 #include "game.h"
 #include "missileEnnemi.h"
+#include "lcdlib.h"
+#include "ennemi.h"
+
 
 void missile_ennemi(void *cookie) {
 
-	int i;
+	int i = 0;
 	int j = 0;
-	int ctr;
 	int err;
 	int nbRandom = 0;
 
@@ -38,34 +40,30 @@ void missile_ennemi(void *cookie) {
 		}
 	}
 
-	// Start le generateur de nombre aleatoire
-	srand(time(NULL));
-
 	while (1) {
 
-		for (i = 0; i < nbShotsMax; i++) {
-			if (shot_ennemi[i].enable = 0)
-				// Place disponible dans le tableau
-				exit;
-		}
+		// Place disponible dans le tableau	de tir
+		while(shot_ennemi[shot_free].enable == 1)
+			shot_free++;
+
 
 		// Choisi un vaisseau ennemi au hasard sur la premiere vague
-		nbRandom = rand() % nbVagueEnnemis;
+		nbRandom = get_random() % nbVagueEnnemis;
 
+		// On tir, s il y a encore un vaisseau ennemi "vivant"
 		if (detectShipEnable()) {
 
-			// Met a jour la position des ennemis en y dans un tableu
+			// Met a jour la position des ennemis en y dans un tableau
 			ennemi_pos_y();
 
 			// Tir un missile seulement si un vaisseau est present sur la colonne
 			// definie par le chiffre aleatoire
 			if (ennemi_y_tab[nbRandom].y != EDGE_NORTH) {
-				shot_ennemi[j].x = ennemi_y_tab[nbRandom].x + SHIP_SIZE / 2;
-				shot_ennemi[j].y = ennemi_y_tab[nbRandom].y + SHIP_SIZE;
-				shot_ennemi[j].enable = 1;
-				shot_ennemi[j].direction = DIRECTION_DOWN;
+				shot_ennemi[shot_free].x = ennemi_y_tab[nbRandom].x + SHIP_SIZE / 2;
+				shot_ennemi[shot_free].y = ennemi_y_tab[nbRandom].y + SHIP_SIZE;
+				shot_ennemi[shot_free].enable = 1;
+				shot_ennemi[shot_free].direction = DIRECTION_DOWN;
 			}
-			j++;
 		}
 
 		// Désactive le missile si celui-ci touche le bas de l ecran
