@@ -11,6 +11,8 @@
 #define nbShotsMax 512
 #define EDGE_EAST LCD_MAX_X-4
 #define EDGE_WEST 4
+#define EDGE_NORTH 0
+#define EDGE_SOUTH LCD_MAX_Y
 
 #include <native/task.h>
 #include <native/intr.h>
@@ -49,6 +51,8 @@ typedef struct t_shot {
 extern t_ennemi_ ennemi[nbEnnemis];
 extern t_player_ player[3];
 extern t_shot_ shot[nbShotsMax];
+extern t_shot_ shot_ennemi[nbShotsMax];
+extern ennemi_y_tab[nbEnnemis/nbVagueEnnemis];
 extern unsigned int difficulty;
 extern unsigned int score;
 extern unsigned int speed;

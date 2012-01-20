@@ -32,6 +32,8 @@ t_player_ player[3];
 
 t_shot_ shot[nbShotsMax];
 
+t_shot_ shot_ennemi[nbShotsMax];
+
 t_ennemi_ ennemi[nbEnnemis];
 
 unsigned int speed;

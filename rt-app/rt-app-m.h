@@ -24,6 +24,7 @@
 #define DIRECTION_DOWN 1
 #define SHIP_SIZE 16
 #define DEFAULT_PV_ENNEMI 1
+#define MOVE_MISSILE 1
 #define X_SPACE 4
 #define Y_SPACE 4
 #define xStart 10

@@ -286,28 +286,25 @@ void move_ennemi(void* cookie) {
 
 }
 
-int* ennemi_pos_y (void) {
+void ennemi_pos_y (void) {
 	int i, j;
 	// position de dÃ©part de la vague d'ennemis
 
 	int nbEnnemiParVague = nbEnnemis / nbVagueEnnemis;
 
-	int ennemi_posY[nbEnnemiParVague];
-
 	// Initialisation de la liste des ennemis
-	for (i = 0; i < nbEnnemiParVague; i++) {
-		ennemi_posY[i] = 0;
-	}
+	for (i = 0; i < nbEnnemiParVague; i++)
+		ennemi_y_tab[i] = EDGE_NORTH;
+
 
 	// initialisation vaisseaux ennemis
 	for (i = 0; i < nbVagueEnnemis; i++) {
 
 		for (j = 0; j < nbEnnemiParVague; j++) {
 
-			if(ennemi_posY[j] < ennemi[i * nbEnnemiParVague + j].y)
-				ennemi_posY[j] = ennemi[i * nbEnnemiParVague + j].y;
+			if(ennemi_y_tab[j] < ennemi[i * nbEnnemiParVague + j].y)
+				ennemi_y_tab[j] = ennemi[i * nbEnnemiParVague + j].y;
 		}
 	}
 
-	return ennemi_posY;
 }
