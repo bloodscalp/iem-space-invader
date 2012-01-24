@@ -31,9 +31,9 @@
 
 t_player_ player[NB_PLAYER];
 
-t_shot_ shot[nbShotsMax];
+t_shot_ shot[NB_MAX_SHOTS];
 
-t_shot_ shot_ennemi[nbShotsMax];
+t_shot_ shot_ennemi[NB_MAX_SHOTS];
 
 t_ennemi_ ennemi[nbEnnemis];
 

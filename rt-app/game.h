@@ -49,9 +49,9 @@ typedef struct t_shot {
 
 extern t_ennemi_ ennemi[nbEnnemis];
 extern t_ennemi_ ennemi_y_tab[nbEnnemis/nbVagueEnnemis];
-extern t_player_ player[3];
-extern t_shot_ shot[nbShotsMax];
-extern t_shot_ shot_ennemi[nbShotsMax];
+extern t_player_ player[NB_PLAYER];
+extern t_shot_ shot[NB_MAX_SHOTS];
+extern t_shot_ shot_ennemi[NB_MAX_SHOTS];
 
 extern unsigned int difficulty;
 extern unsigned int score;

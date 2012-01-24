@@ -108,7 +108,6 @@ void move_ennemi(void* cookie) {
 	int direction;
 	int yFirstEnnemi = yStart;
 	int err;
-	int speed = 5;
 	bool directionChanged;
 
 	// Configuration de la tâche périodique
@@ -188,7 +187,7 @@ void move_ennemi(void* cookie) {
 						xLastEnnemi = ennemi[i].x;
 					}
 				}
-				// dÃ©tection vaisseaux touchent le bord Ã  l'est
+				// detection vaisseaux touchent le bord Ã  l'est
 				if ((EDGE_WEST + speed) > xLastEnnemi) { //&& (xLastEnnemi <= EDGE_WEST)
 					direction = DIRECTION_EST;
 					yFirstEnnemi += Y_SPACE;
@@ -249,7 +248,7 @@ void move_ennemi(void* cookie) {
 
 			for (i = 0; i < nbEnnemis; i++) {
 				if (directionChanged) {
-					ennemi[i].y += speed;
+					ennemi[i].y += MOVE_ENNEMI_Y;
 
 				} else {
 					ennemi[i].x += speed * direction;

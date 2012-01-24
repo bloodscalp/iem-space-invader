@@ -20,6 +20,8 @@ void missile_ennemi(void *cookie) {
 	int err;
 	int nbRandom = 0;
 	int shot_free = 0;
+	int maxshotlvl = 10;
+	int i;
 
 	/* Configuration de la tâche périodique */
 	if (TIMER_PERIODIC) {
@@ -43,24 +45,37 @@ void missile_ennemi(void *cookie) {
 
 		// Trouve le premier tir disponible
 		while(shot[shot_free].enable == 1)
+		{
 			shot_free++;
 
+			//if(shot_free == NB_MAX_SHOTS - 1 )
+			//	shot_free = 0;
+		}
 
-		// Choisi un vaisseau ennemi au hasard
-		nbRandom = get_random() % nbEnnemis;
 
-		// On tir, s il y a encore un vaisseau ennemi "vivant"
-		if (detectShipEnable()) {
+			//shot_free = (shot_free++)%NB_MAX_SHOTS;
 
-			// Met a jour la position des ennemis en y dans un tableau
-			//ennemi_pos_y();
+		// Random pour savoir si on va effectuer un tir ou non
+		// en fonction du level où l'on est
+		// On génére un nombre aléatoire de 1 à maxshotlvl (10)
+		// Si ce nombre est inférieur au niveau auxquel on est,
+		// on tir
 
-			// Tir un missile depuis un ennemi au hasard
-			if (ennemi[nbRandom].enable == 1) {
-				shot[shot_free].x = ennemi[nbRandom].x + SHIP_SIZE / 2;
-				shot[shot_free].y = ennemi[nbRandom].y + SHIP_SIZE;
-				shot[shot_free].enable = 1;
-				shot[shot_free].direction = DIRECTION_DOWN;
+		if((get_random() % maxshotlvl) + 1 <= speed)
+		{
+			// Choisi un vaisseau ennemi au hasard
+			nbRandom = get_random() % nbEnnemis;
+
+			// On tir, s il y a encore un vaisseau ennemi "vivant"
+			if (detectShipEnable()) {
+
+				// Tir un missile si le vaisseau ennemi existe
+				if (ennemi[nbRandom].enable == 1) {
+					shot[shot_free].x = ennemi[nbRandom].x + SHIP_SIZE / 2 - 4;
+					shot[shot_free].y = ennemi[nbRandom].y + SHIP_SIZE;
+					shot[shot_free].enable = 1;
+					shot[shot_free].direction = DIRECTION_DOWN;
+				}
 			}
 		}
 
