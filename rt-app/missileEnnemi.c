@@ -21,6 +21,7 @@ void missile_ennemi(void *cookie) {
 	int j = 0;
 	int err;
 	int nbRandom = 0;
+	int shot_free;
 
 	/* Configuration de la tâche périodique */
 	if (TIMER_PERIODIC) {
@@ -43,7 +44,7 @@ void missile_ennemi(void *cookie) {
 	while (1) {
 
 		// Place disponible dans le tableau	de tir
-		while(shot_ennemi[shot_free].enable == 1)
+		while(shot[shot_free].enable == 1)
 			shot_free++;
 
 
@@ -59,25 +60,14 @@ void missile_ennemi(void *cookie) {
 			// Tir un missile seulement si un vaisseau est present sur la colonne
 			// definie par le chiffre aleatoire
 			if (ennemi_y_tab[nbRandom].y != EDGE_NORTH) {
-				shot_ennemi[shot_free].x = ennemi_y_tab[nbRandom].x + SHIP_SIZE / 2;
-				shot_ennemi[shot_free].y = ennemi_y_tab[nbRandom].y + SHIP_SIZE;
-				shot_ennemi[shot_free].enable = 1;
-				shot_ennemi[shot_free].direction = DIRECTION_DOWN;
+				shot[shot_free].x = ennemi_y_tab[nbRandom].x + SHIP_SIZE / 2;
+				shot[shot_free].y = ennemi_y_tab[nbRandom].y + SHIP_SIZE;
+				shot[shot_free].enable = 1;
+				shot[shot_free].direction = DIRECTION_DOWN;
 			}
 		}
 
-		// Désactive le missile si celui-ci touche le bas de l ecran
-		// TODO : doit etre desactive lorsque celui-ci touche un joueur
-		for (i = 0; i < nbShotsMax; j++) {
-			if (shot_ennemi[i].y >= EDGE_SOUTH - MISSILE_SIZE)
-				shot_ennemi[i].enable = 0;
-		}
 
-		// Mouvement des missiles pas a pas
-		for (i = 0; i < nbShotsMax; j++) {
-			if (shot_ennemi[i].enable == 1)
-				shot_ennemi[i].y += MOVE_MISSILE;
-		}
 
 		rt_task_wait_period(NULL);
 	}

@@ -37,6 +37,8 @@ t_shot_ shot_ennemi[nbShotsMax];
 
 t_ennemi_ ennemi[nbEnnemis];
 
+t_ennemi_ ennemi_y_tab[nbEnnemis/nbVagueEnnemis];
+
 unsigned int speed;
 
 // 1 = easy, 2 = medium, 3 = hard
@@ -282,6 +284,15 @@ void shots_impacts(void * cookie) {
 			{
 				/* Fait avancer/reculer le tir s'il est enabled */
 				shot[i].y += shot[i].direction;
+
+				// Désactive le missile si celui-ci touche le bas de l ecran
+				// TODO : doit etre desactive lorsque celui-ci touche un joueur
+				if (shot[i].y >= EDGE_SOUTH - MISSILE_SIZE)
+					shot[i].enable = 0;
+				else if(shot[i].y <= EDGE_NORTH + MISSILE_SIZE)
+					shot[i].enable = 0;
+
+
 
 				// Si le shot est à la hauteur du joueur
 				if(shot[i].y > (LCD_MAX_Y-20))
