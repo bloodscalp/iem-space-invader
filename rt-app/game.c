@@ -295,7 +295,7 @@ void shots_impacts(void * cookie) {
 
 
 				// Si le shot est à la hauteur du joueur
-				if(shot[i].y > (LCD_MAX_Y-20))
+				if((shot[i].y > (LCD_MAX_Y-20)) && (shot[i].direction == 1))
 				{
 					for(j = 0; j < 3; j++)
 					{
@@ -312,7 +312,7 @@ void shots_impacts(void * cookie) {
 					}
 				}
 				// Si le shot est dans la zone ennemis
-				else
+				else if(shot[i].direction == -1)
 				{
 					for(j = 0; j < nbEnnemis; j++)
 					{
