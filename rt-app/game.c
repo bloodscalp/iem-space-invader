@@ -49,7 +49,8 @@ unsigned int highScore[10];
 
 RT_MUTEX mutex_ennemi;
 RT_MUTEX mutex_shots;
-RT_TASK move_task, ennemi_task, shots_impacts_task, switch_events_task, refresh_task, missile_ennemi_task;
+RT_MUTEX mutex_score;
+RT_TASK move_task, ennemi_task, shots_impacts_task, switch_events_task, refresh_task, missile_ennemi_task, score_task;
 
 #define PERIOD_TASK_MOVE 50
 
@@ -191,8 +192,6 @@ int switchs_init(void) {
 	return 0;
 }
 
-
-
 void move_player(void * cookie) {
 
 	int err;
@@ -328,8 +327,14 @@ void shots_impacts(void * cookie) {
 							{
 								//printk("Ennemi n°%d touched\n", i);
 								ennemi[j].pv--;
+
+								rt_mutex_lock(&mutex_score, TM_INFINITE);
+								score += speed*10;
+								rt_mutex_unlock(&mutex_score);
+
 								if(ennemi[j].pv == 0)
 								{
+
 									ennemi[j].enable++;
 								}
 								shot[i].enable = 0;

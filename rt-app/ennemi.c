@@ -68,8 +68,22 @@ int ennemi_init(void) {
 			ennemi[i * nbEnnemiParVague + j].y = yStart + (i * (SHIP_SIZE
 					+ Y_SPACE));
 			// Initialise le nombre de point de vie selon la difficultÃ©
-			ennemi[i * nbEnnemiParVague + j].pv = difficulty
-					* DEFAULT_PV_ENNEMI;
+			if(speed >= 1 && speed < 5)
+			{
+				ennemi[i * nbEnnemiParVague + j].pv = 1;
+			}
+			else if(speed >= 5 && speed < 10)
+			{
+				ennemi[i * nbEnnemiParVague + j].pv = 2;
+			}
+			else if(speed >= 10 && speed < 15 )
+			{
+				ennemi[i * nbEnnemiParVague + j].pv = 3;
+			}
+			else if(speed >= 15 )
+			{
+				ennemi[i * nbEnnemiParVague + j].pv = 4;
+			}
 		}
 	}
 	rt_mutex_unlock(&mutex_ennemi);

@@ -56,6 +56,8 @@ void missile_ennemi(void *cookie) {
 		// Si ce nombre est inférieur au niveau auxquel on est,
 		// on tir
 		if ((get_random() % maxshotlvl) + 1 <= speed) {
+
+			// Détecte si un vaisseau ennemi existe
 			if (detectShipEnable()) {
 
 				while (1) {
@@ -66,7 +68,7 @@ void missile_ennemi(void *cookie) {
 						break;
 				}
 
-				// On tir, s il y a encore un vaisseau ennemi "vivant"
+
 
 				// Tir un missile si le vaisseau ennemi existe
 				shot[shot_free].x = ennemi[nbRandom].x + SHIP_SIZE / 2;
