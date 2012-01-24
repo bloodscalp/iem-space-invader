@@ -193,7 +193,10 @@ int pca9554_init() {
 		return err;
 	}
 
-	pca9554_ioctl(NULL, NULL, POLARITY, I2C_POLARITY);
+	if ((err = pca9554_ioctl(NULL, NULL, POLARITY, I2C_POLARITY)) < 0) {
+		printk("I2C polarity config error : %d\n", err);
+		return err;
+	}
 
 	pca9554_state = CONFIGURED;
 	return 0;
