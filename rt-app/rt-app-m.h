@@ -33,6 +33,9 @@
 #define Y_SPACE 4
 #define xStart 10
 #define yStart 10
+#define ALLIED_SHIPS_SPACING 	20
+#define ALLIED_SHIPS_HP 		1
+#define NB_PLAYER 				3
 
 #define STEP_MOVE_ENNEMI 4
 

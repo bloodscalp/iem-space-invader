@@ -8,12 +8,11 @@
 #ifndef GAME_H_
 #define GAME_H_
 
-#define nbShotsMax 512
 #define EDGE_EAST LCD_MAX_X
 #define EDGE_WEST 0
 #define EDGE_NORTH 0
 #define EDGE_SOUTH LCD_MAX_Y
-#define NB_PLAYER 3
+
 
 #include <native/task.h>
 #include <native/intr.h>
@@ -68,6 +67,8 @@ bool detectShitEnable(void);
 void tri_score(void);
 void player_died(void);
 void level_up(void);
+void reinforcement_handler(void);
+void player_shots_handler(void);
 
 extern RT_MUTEX mutex_ennemi, mutex_shots;
 extern RT_TASK move_task, ennemi_task, shots_impacts_task, switch_events_task, refresh_task, missile_ennemi_task;

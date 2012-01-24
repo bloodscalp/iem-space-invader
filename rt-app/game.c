@@ -195,6 +195,7 @@ int switchs_init(void) {
 
 void move_player(void * cookie) {
 
+	int i;
 	int err;
 	int border = 15;
 	int EdgeX_left = border;
@@ -229,16 +230,17 @@ void move_player(void * cookie) {
 				printk("x = %d, y = %d\n", touch_info.x, touch_info.y);
 				touch = 1;
 
-				if (touch_info.x > player[0].x) {
-					if (player[0].x + 16 < EdgeX_right)
-						player[0].x += speed;
-				} else {
-					if (player[0].x > EdgeX_left)
-						player[0].x -= speed;
+				for(i=0; i<NB_PLAYER; i++) {
+					if (touch_info.x > player[i].x) {
+						if (player[i].x + 16 < EdgeX_right)
+							player[i].x += speed;
+					} else {
+						if (player[i].x > EdgeX_left)
+							player[i].x -= speed;
+					}
 				}
 
-				while (xeno_ts_read(&touch_info, 1, O_NONBLOCK) > 0)
-					;
+				while (xeno_ts_read(&touch_info, 1, O_NONBLOCK) > 0);
 			}
 		}
 
@@ -283,7 +285,7 @@ void shots_impacts(void * cookie) {
 		rt_task_wait_period(NULL);
 
 		/* Parcours la liste des tirs */
-		for(i=0; i<nbShotsMax; i++) {
+		for(i=0; i<NB_MAX_SHOTS; i++) {
 			if(shot[i].enable == 1)
 			{
 				/* Fait avancer/reculer le tir s'il est enabled */
@@ -358,27 +360,8 @@ void hp_update_leds() {
 
 	/* Conversion int -> LEDS */
 	buf = 0x0F << hp;
-
 	buf &= 0xF0;
-
 	buf = buf >> MAX_HP;
-
-	/* Inversion des hp pour décrémentation depuis le haut */
-//	switch(buf) {
-//		case 0x1:
-//			buf = 0x8;
-//			break;
-//
-//		case 0x3:
-//			buf = 0xC;
-//			break;
-//
-//		case 0x7:
-//			buf = 0xE;
-//			break;
-//	}
-
-	printk("Lives buf : %X\n", buf);
 
 	if((err = pca9554_write(NULL, &buf, 1, NULL)) < 0) {
 		printk("i2c write error : %d\n", err);
@@ -416,7 +399,7 @@ void player_died()
 	player[0].x = LCD_MAX_X / 2 - 8;
 	player[0].y = LCD_MAX_Y - 20;
 
-	for(i = 0; i < nbShotsMax; i++)
+	for(i = 0; i < NB_MAX_SHOTS; i++)
 	{
 		shot[i].enable = 0;
 	}
@@ -447,7 +430,7 @@ void level_up()
 
 	ennemi_init();
 
-	for(i = 0; i < nbShotsMax; i++)
+	for(i = 0; i < NB_MAX_SHOTS; i++)
 	{
 		shot[i].enable = 0;
 	}
@@ -535,4 +518,53 @@ void game_main(void) {
 		return;
 	}
 
+}
+
+void reinforcement_handler() {
+	int i;
+
+	/* Pour chaque vaisseau allié */
+	for(i=1; i<NB_PLAYER; i++) {
+		/* L'active */
+		player[i].enable = 1;
+		player[i].lifes = ALLIED_SHIPS_HP;
+		player[i].y = player[0].y;
+
+		/* Le décale à droite/gauche du vaisseau du joueur */
+		if(i%2)
+			player[i].x = player[0].x+SHIP_SIZE*i/2+ALLIED_SHIPS_SPACING*i/2;
+		else
+			player[i].x = player[0].x-SHIP_SIZE*i/2-ALLIED_SHIPS_SPACING*i/2;
+	}
+}
+
+void player_shots_handler() {
+	int i, k;
+
+	/* Pour chaque vaisseau actif */
+	for(k=0; k<NB_PLAYER; k++) {
+
+		/* S'il n'est pas actif, passe au suivant */
+		if(!player[k].enable)
+			continue;
+
+		/* Parcours le tableau des tirs */
+		for (i = 0; i < NB_MAX_SHOTS; i++) {
+
+			rt_mutex_lock(&mutex_shots, TM_INFINITE);
+
+			/* Si le tir courant est inactif */
+			if (shot[i].enable == 0) {
+				/* L'initialise et l'active */
+				shot[i].x = player[k].x + SHIP_SIZE / 2;
+				shot[i].y = player[k].y;
+				shot[i].direction = DIRECTION_UP; // Moves up
+				shot[i].enable = 1;
+				rt_mutex_unlock(&mutex_shots);
+				break;
+			} else {
+				rt_mutex_unlock(&mutex_shots);
+			}
+		}
+	}
 }

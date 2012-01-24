@@ -174,7 +174,7 @@ extern void refresh(void* cookie)
     	}
 
     	// Affichage du joueur
-    	for(k = 0; k < 3; k++)
+    	for(k = 0; k < NB_PLAYER; k++)
     	{
     		if(player[k].enable == 1)
     		{
@@ -223,7 +223,7 @@ extern void refresh(void* cookie)
     	}
 
     	// Affichage des shots en blanc
-    	for(k = 0; k < nbShotsMax; k++)
+    	for(k = 0; k < NB_MAX_SHOTS; k++)
     	{
     		if(shot[k].enable == 1)
     		{
