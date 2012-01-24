@@ -123,7 +123,7 @@ void check_switch_events_once(void) {
 
 		/* Analyse s'il y a eu un changement (rise) */
 		switch_change = (buf[0] ^ lastBuf[0]) >> 4;
-		switch_change_up = switch_change & ~(buf[0] >> 4);
+		switch_change_up = switch_change & (buf[0] >> 4);
 
 
 		/* Met à jour les event flags selon les switchs */
