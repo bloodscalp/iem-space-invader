@@ -9,8 +9,8 @@
 #define GAME_H_
 
 #define nbShotsMax 512
-#define EDGE_EAST LCD_MAX_X-4
-#define EDGE_WEST 4
+#define EDGE_EAST LCD_MAX_X
+#define EDGE_WEST 0
 #define EDGE_NORTH 0
 #define EDGE_SOUTH LCD_MAX_Y
 #define NB_PLAYER 3

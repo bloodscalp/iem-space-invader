@@ -53,8 +53,6 @@ RT_TASK move_task, ennemi_task, shots_impacts_task, switch_events_task, refresh_
 
 #define PERIOD_TASK_MOVE 50
 
-
-
 int err;
 int i2c_fd;
 

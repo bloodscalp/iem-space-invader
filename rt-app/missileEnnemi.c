@@ -21,7 +21,6 @@ void missile_ennemi(void *cookie) {
 	int nbRandom = 0;
 	int shot_free = 0;
 	int maxshotlvl = 10;
-	int i;
 
 	/* Configuration de la tâche périodique */
 	if (TIMER_PERIODIC) {
@@ -50,19 +49,16 @@ void missile_ennemi(void *cookie) {
 		{
 			shot_free++;
 
-			//if(shot_free == NB_MAX_SHOTS - 1 )
-			//	shot_free = 0;
+			if(shot_free == (NB_MAX_SHOTS - 1))
+				shot_free = 0;
 		}
 
-
-			//shot_free = (shot_free++)%NB_MAX_SHOTS;
 
 		// Random pour savoir si on va effectuer un tir ou non
 		// en fonction du level où l'on est
 		// On génére un nombre aléatoire de 1 à maxshotlvl (10)
 		// Si ce nombre est inférieur au niveau auxquel on est,
 		// on tir
-
 		if((get_random() % maxshotlvl) + 1 <= speed)
 		{
 			// Choisi un vaisseau ennemi au hasard

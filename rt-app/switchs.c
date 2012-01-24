@@ -82,9 +82,14 @@ void switch_events_handler(void *cookie) {
 					shot[i].direction = DIRECTION_UP; // Moves up
 					shot[i].enable = 1;
 					shotDone = 1;
+					rt_mutex_unlock(&mutex_shots);
 					break;
 				}
-				rt_mutex_unlock(&mutex_shots);
+				else
+				{
+					rt_mutex_unlock(&mutex_shots);
+				}
+
 			}
 
 			if(!shotDone) {
