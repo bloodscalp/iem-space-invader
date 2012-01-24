@@ -67,7 +67,7 @@ int game_init(void) {
 	player[0].y = LCD_MAX_Y - 20;
 	player[0].lifes = MAX_HP;
 
-	for(i = 0; i < nbShotsMax; i++)
+	for(i = 0; i < NB_MAX_SHOTS; i++)
 	{
 		shot[i].enable = 0;
 	}
@@ -402,6 +402,11 @@ void player_died()
 	player[0].lifes--;
 	hp_update_leds();
 
+
+	for(i=1; i<NB_PLAYER; i++) {
+		player[i].enable = 0;
+	}
+
 	if(player[0].lifes == 0)
 		return;
 
@@ -439,6 +444,10 @@ void level_up()
 	speed++;
 
 	ennemi_init();
+
+	for(i=1; i<NB_PLAYER; i++) {
+		player[i].enable = 0;
+	}
 
 	for(i = 0; i < NB_MAX_SHOTS; i++)
 	{
@@ -553,7 +562,7 @@ void reinforcement_handler() {
 		if(i%2)
 			player[i].x = player[0].x+SHIP_SIZE*i/2+ALLIED_SHIPS_SPACING*i/2;
 		else
-			player[i].x = player[0].x-SHIP_SIZE*i/2-ALLIED_SHIPS_SPACING*i/2;
+			player[i].x = player[0].x-ALLIED_SHIPS_SPACING*i/2;
 	}
 }
 
