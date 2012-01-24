@@ -132,7 +132,7 @@ int game_init(void) {
 	if(switchs_init() < 0)
 		return -1;
 
-
+ */
 	// Création de la tâche gérant les switchs
 	err =  rt_task_create (&switch_events_task, "switch_events", STACK_SIZE, 50, 0);
 	if (err != 0) {
@@ -148,7 +148,12 @@ int game_init(void) {
 		return -1;
 	}
 
- */
+	err = rt_task_set_priority(&switch_events_task, 99);
+	if (err != 0) {
+		printk("Switch events task set prio failed: %d\n", err);
+		return -1;
+	}
+
 	rt_mutex_create(&mutex_ennemi, "mutex ennemi");
 
 	return 0;
