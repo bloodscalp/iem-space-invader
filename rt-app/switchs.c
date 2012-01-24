@@ -58,9 +58,11 @@ void switch_events_handler(void *cookie) {
 			SW5_event = 0;
 			SW3_event = 0;
 
-			player[0].lifes++;
-			hp_update_leds();
-
+			if(player[0].lifes < 4)
+			{
+				player[0].lifes++;
+				hp_update_leds();
+			}
 		}
 
 		/* Nouveau tir */
@@ -69,6 +71,8 @@ void switch_events_handler(void *cookie) {
 
 			/* Parcours le tableau des tirs */
 			for(i=0; i<NB_MAX_SHOTS; i++) {
+
+				rt_mutex_lock(&mutex_shots, TM_INFINITE);
 
 				/* Si le tir courant est inactif */
 				if(shot[i].enable == 0) {
@@ -80,6 +84,7 @@ void switch_events_handler(void *cookie) {
 					shotDone = 1;
 					break;
 				}
+				rt_mutex_unlock(&mutex_shots);
 			}
 
 			if(!shotDone) {
@@ -89,20 +94,10 @@ void switch_events_handler(void *cookie) {
 
 		if(SW3_event) {
 			SW3_event = 0;
-
-			if(player[0].lifes < 4) {
-				player[0].lifes++;
-				hp_update_leds();
-			}
 		}
 
 		if(SW4_event) {
 			SW4_event = 0;
-
-			if(player[0].lifes > 0) {
-				player[0].lifes--;
-				hp_update_leds();
-			}
 		}
 	}
 }

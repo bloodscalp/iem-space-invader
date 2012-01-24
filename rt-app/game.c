@@ -48,6 +48,7 @@ unsigned int score;
 unsigned int highScore[10];
 
 RT_MUTEX mutex_ennemi;
+RT_MUTEX mutex_shots;
 RT_TASK move_task, ennemi_task, shots_impacts_task, switch_events_task, refresh_task, missile_ennemi_task;
 
 #define PERIOD_TASK_MOVE 50
@@ -176,6 +177,7 @@ int game_init(void) {
 	}
 */
 	rt_mutex_create(&mutex_ennemi, "mutex ennemi");
+	rt_mutex_create(&mutex_shots, "mutex shots");
 
 	return 0;
 

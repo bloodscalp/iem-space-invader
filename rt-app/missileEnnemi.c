@@ -41,6 +41,8 @@ void missile_ennemi(void *cookie) {
 
 	while (1) {
 
+		rt_mutex_lock(&mutex_shots, TM_INFINITE);
+
 		// Trouve le premier tir disponible
 		while(shot[shot_free].enable == 1)
 			shot_free++;
@@ -64,7 +66,7 @@ void missile_ennemi(void *cookie) {
 			}
 		}
 
-
+		rt_mutex_unlock(&mutex_shots);
 
 		rt_task_wait_period(NULL);
 	}

@@ -260,20 +260,7 @@ void move_ennemi(void* cookie) {
 
 			directionChanged = false;
 
-			/****************************************************************/
 
-			/* Vaisseaux Ennemis : enable
-			 *
-			 * Le vaisseau ennemi est détruit lorsqu'il n'a plus de point de vie
-			 *
-			 */
-
-			for (i = 0; i < nbEnnemis; i++) {
-				if (ennemi[i].pv == 0) {
-					ennemi[i].enable = 2;
-				}
-			}
-			/****************************************************************/
 			rt_task_wait_period(NULL);
 		}
 

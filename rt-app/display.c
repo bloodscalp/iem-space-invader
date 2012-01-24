@@ -147,6 +147,7 @@ extern void refresh(void* cookie)
 					}
 				}
 				ennemi[k].enable++;
+				printk("ennemi.enable: %d\n", ennemi[k].enable);
     		}
     		else if(ennemi[k].enable == 3)
     		{
@@ -158,6 +159,7 @@ extern void refresh(void* cookie)
 					}
 				}
 				ennemi[k].enable++;
+				printk("ennemi.enable: %d\n", ennemi[k].enable);
     		}
     		else if(ennemi[k].enable == 4)
     		{
@@ -169,6 +171,7 @@ extern void refresh(void* cookie)
 					}
 				}
 				ennemi[k].enable = 0;
+				printk("ennemi.enable: %d\n", ennemi[k].enable);
     		}
 
     	}
