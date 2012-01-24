@@ -66,7 +66,9 @@ int game_init(void) {
 	player[0].enable = 1;
 	player[0].x = LCD_MAX_X / 2 - 8;
 	player[0].y = LCD_MAX_Y - 20;
-	player[0].lifes = 4;
+	player[0].lifes = MAX_HP;
+
+	hp_update_leds();
 
 	// Création de la tâche gérant le rafraichissement de l'écran
 	err = rt_task_create(&refresh_task, "refresh", STACK_SIZE, 50, 0);
@@ -310,7 +312,6 @@ void shots_impacts(void * cookie) {
 							{
 								printk("Player touched\n");
 								player[j].enable++;
-								player[j].lifes--;
 								shot[i].enable = 0;
 							}
 						}
@@ -348,35 +349,42 @@ void shots_impacts(void * cookie) {
 // Actualise l'état des leds en fonction du nombre de vies du joueur
 void hp_update_leds() {
 
-	char buf[1];
+	char buf;
 	int hp = player[0].lifes;
 
 	if(hp < 0)
 		hp = 0;
-	else if(hp < MAX_HP)
+	else if(hp > MAX_HP)
 		hp = MAX_HP;
 
 
 	/* Conversion int -> LEDS */
-	buf[0] = 0x0F << hp;
+	buf = 0x0F << hp;
+
+	buf &= 0xF0;
+
+	buf = buf >> MAX_HP;
+
+	buf = ~buf;
 
 	/* Inversion des hp pour décrémentation depuis le haut */
-	switch(buf[0]) {
-		case 0x1:
-			buf[0] = 0x8;
-			break;
+//	switch(buf) {
+//		case 0x1:
+//			buf = 0x8;
+//			break;
+//
+//		case 0x3:
+//			buf = 0xC;
+//			break;
+//
+//		case 0x7:
+//			buf = 0xE;
+//			break;
+//	}
 
-		case 0x3:
-			buf[0] = 0xC;
-			break;
+	printk("Lives buf : %X\n", buf);
 
-		case 0x7:
-			buf[0] = 0xE;
-			break;
-	}
-
-
-	if((err = pca9554_write(NULL, buf, 1, NULL)) < 0) {
+	if((err = pca9554_write(NULL, &buf, 1, NULL)) < 0) {
 		printk("i2c write error : %d\n", err);
 	}
 }
@@ -401,6 +409,12 @@ void tri_score(){
 void player_died()
 {
 	int i, j;
+
+	player[0].lifes--;
+	hp_update_leds();
+
+	if(player[0].lifes == 0)
+		return;
 
 	player[0].enable = 1;
 	player[0].x = LCD_MAX_X / 2 - 8;
@@ -494,12 +508,13 @@ void game_main(void) {
 		return;
 	}
 
-	while(player[0].lifes != 0)
+	while(player[0].lifes > 0)
 	{
 		if(player[0].enable == 0)
 		{
 			printk("player died\n");
 			player_died();
+			printk("player lifes: %d\n", player[0].lifes);
 		}
 
 		sum = 0;

@@ -110,12 +110,11 @@ ssize_t pca9554_write(struct file *file, const char __user *buff, size_t len, lo
 	int err, i;
 	char kbuf[len+1], tmpbuff[len];
 
-
 	if(pca9554_state == CONFIGURED) {
 
 		/* Si read est appelée depuis le noyau */
 		if(file == NULL) {
-			memcpy(kbuf, buff, len);
+			memcpy(tmpbuff, buff, len);
 		/* Si read est appelée depuis le userspace */
 		} else {
 			if ((err = copy_from_user(tmpbuff, buff, len)) > 0) {
