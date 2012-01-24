@@ -43,25 +43,24 @@ void missile_ennemi(void *cookie) {
 
 	while (1) {
 
-		// Place disponible dans le tableau	de tir
+		// Trouve le premier tir disponible
 		while(shot[shot_free].enable == 1)
 			shot_free++;
 
 
-		// Choisi un vaisseau ennemi au hasard sur la premiere vague
-		nbRandom = get_random() % nbVagueEnnemis;
+		// Choisi un vaisseau ennemi au hasard
+		nbRandom = get_random() % nbEnnemis;
 
 		// On tir, s il y a encore un vaisseau ennemi "vivant"
 		if (detectShipEnable()) {
 
 			// Met a jour la position des ennemis en y dans un tableau
-			ennemi_pos_y();
+			//ennemi_pos_y();
 
-			// Tir un missile seulement si un vaisseau est present sur la colonne
-			// definie par le chiffre aleatoire
-			if (ennemi_y_tab[nbRandom].y != EDGE_NORTH) {
-				shot[shot_free].x = ennemi_y_tab[nbRandom].x + SHIP_SIZE / 2;
-				shot[shot_free].y = ennemi_y_tab[nbRandom].y + SHIP_SIZE;
+			// Tir un missile depuis un ennemi au hasard
+			if (ennemi[nbRandom].enable == 1) {
+				shot[shot_free].x = ennemi[nbRandom].x + SHIP_SIZE / 2;
+				shot[shot_free].y = ennemi[nbRandom].y + SHIP_SIZE;
 				shot[shot_free].enable = 1;
 				shot[shot_free].direction = DIRECTION_DOWN;
 			}
