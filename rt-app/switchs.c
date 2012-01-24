@@ -65,6 +65,8 @@ void switch_events_handler(void *cookie) {
 
 		/* Nouveau tir */
 		if(SW2_event) {
+			printk("Shot! \n");
+
 			SW2_event = 0;
 
 			/* Parcours le tableau des tirs */
@@ -115,7 +117,7 @@ void switch_events_handler(void *cookie) {
 void check_switch_events_once(void) {
 
 	char buf[1];
-	char lastBuf[1];
+	static char lastBuf[1];
 	int err;
 
 	char switch_change, switch_change_up;
