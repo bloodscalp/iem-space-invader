@@ -25,12 +25,15 @@
 #include "display.h"
 #include "ennemi.h"
 #include "switchs.h"
+#include "missileEnnemi.h"
 
 
 
 t_player_ player[3];
 
 t_shot_ shot[nbShotsMax];
+
+t_shot_ shot_ennemi[nbShotsMax];
 
 t_ennemi_ ennemi[nbEnnemis];
 
@@ -43,7 +46,7 @@ unsigned int score;
 unsigned int highScore[10];
 
 RT_MUTEX mutex_ennemi;
-RT_TASK move_task, ennemi_task, shots_impacts_task, switch_events_task, refresh_task;
+RT_TASK move_task, ennemi_task, shots_impacts_task, switch_events_task, refresh_task, missile_ennemi_task;
 
 #define PERIOD_TASK_MOVE 50
 
@@ -123,6 +126,20 @@ int game_init(void) {
 		return -1;
 	}
 
+	// Création de la tâche gérant les tirs et les impacts
+	err =  rt_task_create (&missile_ennemi_task, "shots_ennemi", STACK_SIZE, 50, 0);
+	if (err != 0) {
+		printk("Shots ennemi task creation failed: %d\n", err);
+		return -1;
+	}
+
+	printk("Shots ennemi task created\n");
+
+	err = rt_task_start(&missile_ennemi_task, missile_ennemi, 0);
+	if (err != 0) {
+		printk("Shots ennemi task start failed: %d\n", err);
+		return -1;
+	}
 
 	/* Initialisation de l'interface i2c */
 	if(pca9554_init() < 0)

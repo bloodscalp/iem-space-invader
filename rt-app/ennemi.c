@@ -25,7 +25,6 @@
 #include "display.h"
 #include "ennemi.h"
 
-
 /*
  * Fonction qui retourne "true" s'il existe encore
  * un vaisseau ennemi en vie
@@ -45,7 +44,7 @@ bool detectShipEnable(void) {
 int ennemi_init(void) {
 
 	int i, j;
-	int nbEnnemiParVague;
+	//int nbEnnemiParVague;
 
 	// position de dÃ©part de la vague d'ennemis
 	if (nbEnnemis % nbVagueEnnemis != 0) {
@@ -53,7 +52,7 @@ int ennemi_init(void) {
 		return -1;
 	}
 
-	nbEnnemiParVague = nbEnnemis / nbVagueEnnemis;
+	//nbEnnemiParVague = nbEnnemis / nbVagueEnnemis;
 
 	rt_mutex_lock(&mutex_ennemi, TM_INFINITE);
 
@@ -80,9 +79,6 @@ int ennemi_init(void) {
 
 void show_ennemi(void) {
 	int i, j;
-	// position de dÃ©part de la vague d'ennemis
-
-	int nbEnnemiParVague = nbEnnemis / nbVagueEnnemis;
 
 	for (j = 0; j < nbEnnemiParVague; j++) {
 		// Active tous les ennemis
@@ -222,17 +218,17 @@ void move_ennemi(void* cookie) {
 			/*
 			 * Test : affiche si la direction doit changer (est <-> ouest)
 
-			if (directionChanged) {
-				printk("changement de direction : oui\n");
-			} else {
-				printk("changement de direction : non\n");
-			}
+			 if (directionChanged) {
+			 printk("changement de direction : oui\n");
+			 } else {
+			 printk("changement de direction : non\n");
+			 }
 
-			printk("xLastEnnemi : %i\n", xLastEnnemi);
-			printk("yLastEnnemi : %i\n", yLastEnnemi);
+			 printk("xLastEnnemi : %i\n", xLastEnnemi);
+			 printk("yLastEnnemi : %i\n", yLastEnnemi);
 
-			printk("*************************************************\n");
- */
+			 printk("*************************************************\n");
+			 */
 			/****************************************************************/
 
 			/* Deplacement vaisseaux ennemis
@@ -282,6 +278,31 @@ void move_ennemi(void* cookie) {
 
 		ennemi_init();
 
+	}
+
+}
+
+// Met a jour la valeur des vaisseaux les plus en bas de l ecran
+// dans le tableau ennemi_y_tab[nbEnnemiParVague]
+void ennemi_pos_y(void) {
+
+	int i, j;
+
+	// Initialisation de la liste des ennemis
+	for (i = 0; i < nbEnnemiParVague; i++)
+		ennemi_y_tab[i].y = EDGE_NORTH;
+
+	// initialisation vaisseaux ennemis
+	for (i = 0; i < nbVagueEnnemis; i++) {
+
+		for (j = 0; j < nbEnnemiParVague; j++) {
+
+			if (ennemi[i * nbEnnemiParVague + j].enable == 1)
+				if (ennemi_y_tab[j].y < ennemi[i * nbEnnemiParVague + j].y) {
+					ennemi_y_tab[j].y = ennemi[i * nbEnnemiParVague + j].y;
+					ennemi_y_tab[j].x = ennemi[i * nbEnnemiParVague + j].x;
+				}
+		}
 	}
 
 }
