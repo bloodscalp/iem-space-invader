@@ -17,11 +17,9 @@
 
 void missile_ennemi(void *cookie) {
 
-	int i = 0;
-	int j = 0;
 	int err;
 	int nbRandom = 0;
-	int shot_free;
+	int shot_free = 0;
 
 	/* Configuration de la tâche périodique */
 	if (TIMER_PERIODIC) {

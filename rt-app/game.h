@@ -13,6 +13,7 @@
 #define EDGE_WEST 4
 #define EDGE_NORTH 0
 #define EDGE_SOUTH LCD_MAX_Y
+#define NB_PLAYER 3
 
 #include <native/task.h>
 #include <native/intr.h>

@@ -29,7 +29,7 @@
 
 
 
-t_player_ player[3];
+t_player_ player[NB_PLAYER];
 
 t_shot_ shot[nbShotsMax];
 
