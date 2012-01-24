@@ -299,7 +299,7 @@ void shots_impacts(void * cookie) {
 
 
 				// Si le shot est à la hauteur du joueur
-				if((shot[i].y > (LCD_MAX_Y-20)) && (shot[i].direction == 1))
+				if((shot[i].y > (LCD_MAX_Y-20)) && (shot[i].direction == DIRECTION_DOWN))
 				{
 					for(j = 0; j < 3; j++)
 					{
@@ -316,7 +316,7 @@ void shots_impacts(void * cookie) {
 					}
 				}
 				// Si le shot est dans la zone ennemis
-				else if((shot[i].y <= (LCD_MAX_Y-20)) && (shot[i].direction == -1))
+				else if((shot[i].y <= (LCD_MAX_Y-20)) && (shot[i].direction == DIRECTION_UP))
 				{
 					for(j = 0; j < nbEnnemis; j++)
 					{
@@ -483,11 +483,20 @@ int end_game(void)
 		return -1;
 	}
 
+	err = rt_task_delete(&missile_ennemi_task);
+	if (err != 0) {
+		printk("delete shots_impacts task failed: %d\n", err);
+		return -1;
+	}
+
 	err = rt_task_delete(&switch_events_task);
 	if (err != 0) {
 		printk("delete switch_events task failed: %d\n", err);
 		return -1;
 	}
+
+	rt_mutex_delete(&mutex_ennemi);
+	rt_mutex_delete(&mutex_shots);
 
 	return 0;
 

@@ -105,10 +105,15 @@ void show_ennemi(void) {
 void move_ennemi(void* cookie) {
 
 	int i;
-	int direction;
+	int direction = DIRECTION_EST;
 	int yFirstEnnemi = yStart;
 	int err;
 	bool directionChanged;
+
+	// Position dernier vaisseaux en x
+	int xLastEnnemi;
+	// Position dernier vaisseaux en y
+	int yLastEnnemi;
 
 	// Configuration de la tâche périodique
 	if (TIMER_PERIODIC) {
@@ -145,131 +150,113 @@ void move_ennemi(void* cookie) {
 	printk("*************************************************\n");
 	while (1) {
 
-		direction = DIRECTION_EST;
+		/****************************************************************/
 
-		while (detectShipEnable()) {
+		/* DÃ©tection xLastEnnemi
+		 *
+		 * Nous testons si un des vaisseaux ennemis a touchÃ©
+		 * un bord (est/ouest), ceci, en fonction de leurs directions.
+		 *
+		 */
 
-			// Position dernier vaisseaux en x
-			int xLastEnnemi;
-			// Position dernier vaisseaux en y
-			int yLastEnnemi;
-
-			/****************************************************************/
-
-			/* DÃ©tection xLastEnnemi
-			 *
-			 * Nous testons si un des vaisseaux ennemis a touchÃ©
-			 * un bord (est/ouest), ceci, en fonction de leurs directions.
-			 *
-			 */
-
-			if (direction == DIRECTION_EST) {
-				xLastEnnemi = 0;
-				// detection du vaisseau le plus Ã  l'est
-				for (i = 0; i < nbEnnemis; i++) {
-					if ((ennemi[i].x > xLastEnnemi) && (ennemi[i].enable == 1)) {
-						xLastEnnemi = ennemi[i].x;
-					}
-
-				}
-				// dÃ©tection vaisseaux touchent le bord Ã  l'est
-				if (xLastEnnemi + SHIP_SIZE > EDGE_EAST - speed) {
-					direction = DIRECTION_OUEST;
-					directionChanged = true;
-					yFirstEnnemi += Y_SPACE;
-				}
-
-			} else {
-				xLastEnnemi = EDGE_EAST;
-				// detection du vaisseau le plus Ã  l'ouest
-				for (i = 0; i < nbEnnemis; i++) {
-					if ((ennemi[i].x < xLastEnnemi) && (ennemi[i].enable == 1)) {
-						xLastEnnemi = ennemi[i].x;
-					}
-				}
-				// detection vaisseaux touchent le bord Ã  l'est
-				if ((EDGE_WEST + speed) > xLastEnnemi) { //&& (xLastEnnemi <= EDGE_WEST)
-					direction = DIRECTION_EST;
-					yFirstEnnemi += Y_SPACE;
-					directionChanged = true;
-				}
-			}
-
-			/****************************************************************/
-
-			/* Detection yLastEnnemi
-			 *
-			 * Peu etre utilisÃ© lorsque les vaisseaux ennemis
-			 * atteignent les vaisseaux alliÃ©s
-			 */
-
-			yLastEnnemi = 0;
-			// detection vaisseaux le plus au sud
+		if (direction == DIRECTION_EST) {
+			xLastEnnemi = 0;
+			// detection du vaisseau le plus Ã  l'est
 			for (i = 0; i < nbEnnemis; i++) {
-				if ((ennemi[i].y > yLastEnnemi) && (ennemi[i].enable == 1)) {
-					yLastEnnemi = ennemi[i].y;
+				if ((ennemi[i].x > xLastEnnemi) && (ennemi[i].enable == 1)) {
+					xLastEnnemi = ennemi[i].x;
 				}
 
 			}
-
-			/****************************************************************/
-
-			/*
-			 * Test : affiche si la direction doit changer (est <-> ouest)
-
-			 if (directionChanged) {
-			 printk("changement de direction : oui\n");
-			 } else {
-			 printk("changement de direction : non\n");
-			 }
-
-			 printk("xLastEnnemi : %i\n", xLastEnnemi);
-			 printk("yLastEnnemi : %i\n", yLastEnnemi);
-
-			 printk("*************************************************\n");
-			 */
-			/****************************************************************/
-
-			/* Deplacement vaisseaux ennemis
-			 *
-			 * AprÃšs avoir effectuÃ© les tests de direction, nous pouvons alors
-			 * dÃ©placer les vaisseaux ennemis vers l'est ou l'ouest.
-			 *
-			 */
-
-			rt_mutex_lock(&mutex_ennemi, TM_INFINITE);
-
-			// Detection : ennemi touche player
-			if(yLastEnnemi >= (EDGE_SOUTH-2*SHIP_SIZE)){
-				for(i = 0; i < NB_PLAYER; i++)
-					if(player[i].enable == 1)
-						player[i].enable = 2;
+			// dÃ©tection vaisseaux touchent le bord Ã  l'est
+			if (xLastEnnemi + SHIP_SIZE > EDGE_EAST - speed) {
+				direction = DIRECTION_OUEST;
+				directionChanged = true;
+				yFirstEnnemi += Y_SPACE;
 			}
 
+		} else {
+			xLastEnnemi = EDGE_EAST;
+			// detection du vaisseau le plus Ã  l'ouest
 			for (i = 0; i < nbEnnemis; i++) {
-				if (directionChanged) {
-					ennemi[i].y += MOVE_ENNEMI_Y;
-
-				} else {
-					ennemi[i].x += speed * direction;
+				if ((ennemi[i].x < xLastEnnemi) && (ennemi[i].enable == 1)) {
+					xLastEnnemi = ennemi[i].x;
 				}
 			}
-
-			rt_mutex_unlock(&mutex_ennemi);
-
-			directionChanged = false;
-
-
-			rt_task_wait_period(NULL);
+			// detection vaisseaux touchent le bord Ã  l'est
+			if ((EDGE_WEST + speed) > xLastEnnemi) { //&& (xLastEnnemi <= EDGE_WEST)
+				direction = DIRECTION_EST;
+				yFirstEnnemi += Y_SPACE;
+				directionChanged = true;
+			}
 		}
 
-		// tous les vaisseaux ennemis ont Ã©tÃ© dÃ©truit : nouveau niveau !
-		printk("Vaisseaux ennemis abattus\n");
-		printk("new level\n");
+		/****************************************************************/
 
-		speed++;
+		/* Detection yLastEnnemi
+		 *
+		 * Peu etre utilisÃ© lorsque les vaisseaux ennemis
+		 * atteignent les vaisseaux alliÃ©s
+		 */
 
-		ennemi_init();
+		yLastEnnemi = 0;
+		// detection vaisseaux le plus au sud
+		for (i = 0; i < nbEnnemis; i++) {
+			if ((ennemi[i].y > yLastEnnemi) && (ennemi[i].enable == 1)) {
+				yLastEnnemi = ennemi[i].y;
+			}
+
+		}
+
+		/****************************************************************/
+
+		/*
+		 * Test : affiche si la direction doit changer (est <-> ouest)
+
+		 if (directionChanged) {
+		 printk("changement de direction : oui\n");
+		 } else {
+		 printk("changement de direction : non\n");
+		 }
+
+		 printk("xLastEnnemi : %i\n", xLastEnnemi);
+		 printk("yLastEnnemi : %i\n", yLastEnnemi);
+
+		 printk("*************************************************\n");
+		 */
+		/****************************************************************/
+
+		/* Deplacement vaisseaux ennemis
+		 *
+		 * AprÃšs avoir effectuÃ© les tests de direction, nous pouvons alors
+		 * dÃ©placer les vaisseaux ennemis vers l'est ou l'ouest.
+		 *
+		 */
+
+		rt_mutex_lock(&mutex_ennemi, TM_INFINITE);
+
+		// Detection : ennemi touche player
+		if(yLastEnnemi >= (EDGE_SOUTH-2*SHIP_SIZE)){
+			for(i = 0; i < NB_PLAYER; i++)
+				if(player[i].enable == 1)
+					player[i].enable = 2;
+		}
+
+		for (i = 0; i < nbEnnemis; i++) {
+			if (directionChanged) {
+				ennemi[i].y += MOVE_ENNEMI_Y;
+
+			} else {
+				ennemi[i].x += speed * direction;
+			}
+		}
+
+		rt_mutex_unlock(&mutex_ennemi);
+
+		directionChanged = false;
+
+
+		rt_task_wait_period(NULL);
 
 	}
 
