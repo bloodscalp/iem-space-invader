@@ -423,7 +423,20 @@ void player_died()
 		}
 	}
 	rt_mutex_unlock(&mutex_ennemi);
+}
 
+void level_up()
+{
+	int i;
+
+	speed++;
+
+	ennemi_init();
+
+	for(i = 0; i < nbShotsMax; i++)
+	{
+		shot[i].enable = 0;
+	}
 
 }
 
@@ -469,6 +482,9 @@ int end_game(void)
 
 void game_main(void) {
 
+	int i;
+	int sum;
+
 	if (game_init() < 0) {
 		printk("game_init() failed");
 		return;
@@ -482,6 +498,17 @@ void game_main(void) {
 			player_died();
 		}
 
+		sum = 0;
+
+		for(i = 0; i < nbEnnemis; i++)
+		{
+			sum += ennemi[i].enable;
+		}
+
+		if(sum == 0)
+		{
+			level_up();
+		}
 
 		rt_task_wait_period(NULL);
 	}
