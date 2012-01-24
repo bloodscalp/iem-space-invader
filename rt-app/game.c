@@ -58,14 +58,19 @@ int err;
 int i2c_fd;
 
 int game_init(void) {
-	int err;
-
-	speed++;
+	int err, i;
 
 	player[0].enable = 1;
+	player[1].enable = 0;
+	player[2].enable = 0;
 	player[0].x = LCD_MAX_X / 2 - 8;
 	player[0].y = LCD_MAX_Y - 20;
 	player[0].lifes = MAX_HP;
+
+	for(i = 0; i < nbShotsMax; i++)
+	{
+		shot[i].enable = 0;
+	}
 
 	hp_update_leds();
 
@@ -298,7 +303,7 @@ void shots_impacts(void * cookie) {
 
 
 				// Si le shot est à la hauteur du joueur
-				if((shot[i].y > (LCD_MAX_Y-20)) && (shot[i].direction == 1))
+				if((shot[i].y > (LCD_MAX_Y-20)) && (shot[i].direction == DIRECTION_DOWN))
 				{
 					for(j = 0; j < 3; j++)
 					{
@@ -315,7 +320,7 @@ void shots_impacts(void * cookie) {
 					}
 				}
 				// Si le shot est dans la zone ennemis
-				else if((shot[i].y <= (LCD_MAX_Y-20)) && (shot[i].direction == -1))
+				else if((shot[i].y <= (LCD_MAX_Y-20)) && (shot[i].direction == DIRECTION_UP))
 				{
 					for(j = 0; j < nbEnnemis; j++)
 					{
@@ -488,11 +493,20 @@ int end_game(void)
 		return -1;
 	}
 
+	err = rt_task_delete(&missile_ennemi_task);
+	if (err != 0) {
+		printk("delete shots_impacts task failed: %d\n", err);
+		return -1;
+	}
+
 	err = rt_task_delete(&switch_events_task);
 	if (err != 0) {
 		printk("delete switch_events task failed: %d\n", err);
 		return -1;
 	}
+
+	rt_mutex_delete(&mutex_ennemi);
+	rt_mutex_delete(&mutex_shots);
 
 	return 0;
 
