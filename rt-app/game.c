@@ -57,14 +57,19 @@ int err;
 int i2c_fd;
 
 int game_init(void) {
-	int err;
-
-	speed++;
+	int err, i;
 
 	player[0].enable = 1;
+	player[1].enable = 0;
+	player[2].enable = 0;
 	player[0].x = LCD_MAX_X / 2 - 8;
 	player[0].y = LCD_MAX_Y - 20;
 	player[0].lifes = MAX_HP;
+
+	for(i = 0; i < nbShotsMax; i++)
+	{
+		shot[i].enable = 0;
+	}
 
 	hp_update_leds();
 
