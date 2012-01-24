@@ -15,7 +15,7 @@
 #define PERIOD_TASK_SWITCHS 50
 #define PERIOD_TASK_ENNEMI 	40
 #define PERIOD_TASK_REFRESH 40
-#define PERIOD_TASK_MISSILE_ENNEMI 300
+#define PERIOD_TASK_MISSILE_ENNEMI 250
 
 #define nbEnnemis 24
 #define nbVagueEnnemis 4
