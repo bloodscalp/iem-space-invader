@@ -44,7 +44,7 @@ typedef struct t_shot {
 	int enable;
 	int x;
 	int y;
-	int direction; // Up = -1, down = 1
+	int direction;
 } t_shot_;
 
 extern t_ennemi_ ennemi[nbEnnemis];

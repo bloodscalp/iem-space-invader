@@ -70,7 +70,7 @@ int pca9554_ioctl(struct inode * inode, struct file *file, unsigned int cmd, uns
 
 ssize_t pca9554_read(struct file *file, char __user *buff, size_t len, loff_t *off) {
 
-	int i, err;
+	int err;
 	char kbuf[len];
 
 	if(pca9554_state == CONFIGURED) {
@@ -88,9 +88,7 @@ ssize_t pca9554_read(struct file *file, char __user *buff, size_t len, loff_t *o
 
 			/* Si read est appelée depuis le noyau */
 			if(file == NULL) {
-				for(i=0; i<len; i++) {
-					buff[i] = kbuf[i];
-				}
+				memcpy(buff, kbuf, len);
 			/* Si read est appelée depuis le userspace */
 			} else {
 				if ((err = copy_to_user(buff, kbuf, len)) > 0) {
@@ -117,9 +115,7 @@ ssize_t pca9554_write(struct file *file, const char __user *buff, size_t len, lo
 
 		/* Si read est appelée depuis le noyau */
 		if(file == NULL) {
-			for(i=0; i<len; i++) {
-				kbuf[i+1] = buff[i];
-			}
+			memcpy(kbuf, buff, len);
 		/* Si read est appelée depuis le userspace */
 		} else {
 			if ((err = copy_from_user(tmpbuff, buff, len)) > 0) {

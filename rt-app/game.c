@@ -144,8 +144,10 @@ int game_init(void) {
 	}
 
 	/* Initialisation de l'interface i2c */
-	if(pca9554_init() < 0)
-		return -1;
+//	if(err = pca9554_init() < 0) {
+//		printk("pca 9554 init failed: %d\n", err);
+//		return -1;
+//	}
 
 	/* Initialisation des switchs
 	if(switchs_init() < 0)
@@ -323,7 +325,7 @@ void shots_impacts(void * cookie) {
 							if( (shot[i].x > ennemi[j].x) && (shot[i].x < (ennemi[j].x + 16))
 							 && (shot[i].y > ennemi[j].y) && (shot[i].y < (ennemi[j].y + 16)) )
 							{
-								printk("Ennemi n°%d touched\n", i);
+								//printk("Ennemi n°%d touched\n", i);
 								ennemi[j].pv--;
 								if(ennemi[j].pv == 0)
 								{
