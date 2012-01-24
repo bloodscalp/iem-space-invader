@@ -240,9 +240,11 @@ void move_ennemi(void* cookie) {
 
 			rt_mutex_lock(&mutex_ennemi, TM_INFINITE);
 
+			// Detection : ennemi touche player
 			if(yLastEnnemi >= (EDGE_SOUTH-2*SHIP_SIZE)){
 				for(i = 0; i < NB_PLAYER; i++)
-					player[i].enable = 2;
+					if(player[i].enable == 1)
+						player[i].enable = 2;
 			}
 
 			for (i = 0; i < nbEnnemis; i++) {
