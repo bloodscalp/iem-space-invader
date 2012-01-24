@@ -20,6 +20,7 @@
 #define I2C_SLAVE 0x0703 	/* IOCTL CMD value to be passed to xeno_i2c_ioctl */
 
 #define I2C_IO_MODES 0xF0
+#define I2C_POLARITY 0xFF
 
 #define BUFF_SIZE 1
 
@@ -70,7 +71,7 @@ int pca9554_ioctl(struct inode * inode, struct file *file, unsigned int cmd, uns
 
 ssize_t pca9554_read(struct file *file, char __user *buff, size_t len, loff_t *off) {
 
-	int err;
+	int err, i;
 	char kbuf[len];
 
 	if(pca9554_state == CONFIGURED) {
@@ -85,6 +86,10 @@ ssize_t pca9554_read(struct file *file, char __user *buff, size_t len, loff_t *o
 			printk("I2C read error : %d\n", err);
 			return err;
 		} else {
+
+			for(i=0; i<len; i++) {
+				kbuf[i] = ~kbuf[i];
+			}
 
 			/* Si read est appelée depuis le noyau */
 			if(file == NULL) {
@@ -126,7 +131,7 @@ ssize_t pca9554_write(struct file *file, const char __user *buff, size_t len, lo
 		kbuf[0] = OUTPUT;
 
 		for(i=0; i<len; i++)
-			kbuf[i+1] = tmpbuff[i];
+			kbuf[i+1] = ~tmpbuff[i];
 
 		if ((err = xeno_i2c_write(kbuf, len+1)) < 0) {
 			printk("I2C write error : %d\n", err);
@@ -187,6 +192,8 @@ int pca9554_init() {
 		printk("I2C IO pins config error : %d\n", err);
 		return err;
 	}
+
+	pca9554_ioctl(NULL, NULL, POLARITY, I2C_POLARITY);
 
 	pca9554_state = CONFIGURED;
 	return 0;

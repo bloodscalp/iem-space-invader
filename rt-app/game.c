@@ -363,8 +363,6 @@ void hp_update_leds() {
 
 	buf = buf >> MAX_HP;
 
-	buf = ~buf;
-
 	/* Inversion des hp pour décrémentation depuis le haut */
 //	switch(buf) {
 //		case 0x1:
