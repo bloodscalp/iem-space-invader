@@ -46,9 +46,8 @@ void missile_ennemi(void *cookie) {
 		// Trouve le premier tir disponible
 		while (shot[shot_free].enable == 1) {
 			shot_free++;
+			shot_free = shot_free % NB_MAX_SHOTS;
 
-			if (shot_free == (NB_MAX_SHOTS))
-				shot_free = 0;
 		}
 
 		// Random pour savoir si on va effectuer un tir ou non
@@ -70,7 +69,7 @@ void missile_ennemi(void *cookie) {
 				// On tir, s il y a encore un vaisseau ennemi "vivant"
 
 				// Tir un missile si le vaisseau ennemi existe
-				shot[shot_free].x = ennemi[nbRandom].x + SHIP_SIZE / 2 - 4;
+				shot[shot_free].x = ennemi[nbRandom].x + SHIP_SIZE / 2;
 				shot[shot_free].y = ennemi[nbRandom].y + SHIP_SIZE;
 				shot[shot_free].enable = 1;
 				shot[shot_free].direction = DIRECTION_DOWN;
