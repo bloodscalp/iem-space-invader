@@ -65,6 +65,7 @@ void move_ennemi(void* cookie);
 void show_ennemi(void);
 bool detectShitEnable(void);
 void tri_score(void);
+void player_died(void);
 
 extern RT_MUTEX mutex_ennemi;
 extern RT_TASK move_task, ennemi_task, shots_impacts_task, switch_events_task, refresh_task, missile_ennemi_task;
