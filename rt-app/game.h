@@ -70,7 +70,7 @@ void level_up(void);
 void reinforcement_handler(void);
 void player_shots_handler(void);
 
-extern RT_MUTEX mutex_ennemi, mutex_shots;
+extern RT_MUTEX mutex_ennemi, mutex_shots, mutex_score;
 extern RT_TASK move_task, ennemi_task, shots_impacts_task, switch_events_task, refresh_task, missile_ennemi_task;
 
 

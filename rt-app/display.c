@@ -147,6 +147,7 @@ extern void refresh(void* cookie)
 					}
 				}
 				ennemi[k].enable++;
+				printk("ennemi.enable: %d\n", ennemi[k].enable);
     		}
     		else if(ennemi[k].enable == 3)
     		{
@@ -158,6 +159,7 @@ extern void refresh(void* cookie)
 					}
 				}
 				ennemi[k].enable++;
+				printk("ennemi.enable: %d\n", ennemi[k].enable);
     		}
     		else if(ennemi[k].enable == 4)
     		{
@@ -169,6 +171,7 @@ extern void refresh(void* cookie)
 					}
 				}
 				ennemi[k].enable = 0;
+				printk("ennemi.enable: %d\n", ennemi[k].enable);
     		}
 
     	}
@@ -197,6 +200,7 @@ extern void refresh(void* cookie)
 					}
 				}
 				player[k].enable++;
+				printk("player.enable: %d\n", player[k].enable);
     		}
     		else if(player[k].enable == 3)
     		{
@@ -208,6 +212,7 @@ extern void refresh(void* cookie)
 					}
 				}
 				player[k].enable++;
+				printk("player.enable: %d\n", player[k].enable);
     		}
     		else if(player[k].enable == 4)
     		{
@@ -219,6 +224,7 @@ extern void refresh(void* cookie)
 					}
 				}
 				player[k].enable = 0;
+				printk("player.enable: %d\n", player[k].enable);
     		}
     	}
 
@@ -254,7 +260,9 @@ extern void refresh(void* cookie)
     	// TEST SCORE
     	if(test % 10 == 0)
     	{
-    		score++;
+    		rt_mutex_lock(&mutex_score, TM_INFINITE);
+    		score += 5;
+    		rt_mutex_unlock(&mutex_score);
     	}
     	test++;
 
