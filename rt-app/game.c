@@ -31,9 +31,9 @@
 
 t_player_ player[NB_PLAYER];
 
-t_shot_ shot[nbShotsMax];
+t_shot_ shot[NB_MAX_SHOTS];
 
-t_shot_ shot_ennemi[nbShotsMax];
+t_shot_ shot_ennemi[NB_MAX_SHOTS];
 
 t_ennemi_ ennemi[nbEnnemis];
 
@@ -52,8 +52,6 @@ RT_MUTEX mutex_shots;
 RT_TASK move_task, ennemi_task, shots_impacts_task, switch_events_task, refresh_task, missile_ennemi_task;
 
 #define PERIOD_TASK_MOVE 50
-
-
 
 int err;
 int i2c_fd;

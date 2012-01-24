@@ -85,6 +85,11 @@ void switch_events_handler(void *cookie) {
 					rt_mutex_unlock(&mutex_shots);
 					break;
 				}
+				else
+				{
+					rt_mutex_unlock(&mutex_shots);
+				}
+
 			}
 
 			if(!shotDone) {

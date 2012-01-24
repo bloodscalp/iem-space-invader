@@ -14,12 +14,12 @@
 #include "lcdlib.h"
 #include "ennemi.h"
 
-
 void missile_ennemi(void *cookie) {
 
 	int err;
 	int nbRandom = 0;
 	int shot_free = 0;
+	int maxshotlvl = 10;
 
 	/* Configuration de la tâche périodique */
 	if (TIMER_PERIODIC) {
@@ -44,25 +44,37 @@ void missile_ennemi(void *cookie) {
 		rt_mutex_lock(&mutex_shots, TM_INFINITE);
 
 		// Trouve le premier tir disponible
-		while(shot[shot_free].enable == 1)
+		while (shot[shot_free].enable == 1) {
 			shot_free++;
 
+			if (shot_free == (NB_MAX_SHOTS))
+				shot_free = 0;
+		}
 
-		// Choisi un vaisseau ennemi au hasard
-		nbRandom = get_random() % nbEnnemis;
+		// Random pour savoir si on va effectuer un tir ou non
+		// en fonction du level où l'on est
+		// On génére un nombre aléatoire de 1 à maxshotlvl (10)
+		// Si ce nombre est inférieur au niveau auxquel on est,
+		// on tir
+		if ((get_random() % maxshotlvl) + 1 <= speed) {
+			if (detectShipEnable()) {
 
-		// On tir, s il y a encore un vaisseau ennemi "vivant"
-		if (detectShipEnable()) {
+				while (1) {
+					// Choisi un vaisseau ennemi au hasard
+					nbRandom = get_random() % nbEnnemis;
 
-			// Met a jour la position des ennemis en y dans un tableau
-			//ennemi_pos_y();
+					if (ennemi[nbRandom].enable == 1)
+						break;
+				}
 
-			// Tir un missile depuis un ennemi au hasard
-			if (ennemi[nbRandom].enable == 1) {
-				shot[shot_free].x = ennemi[nbRandom].x + SHIP_SIZE / 2;
+				// On tir, s il y a encore un vaisseau ennemi "vivant"
+
+				// Tir un missile si le vaisseau ennemi existe
+				shot[shot_free].x = ennemi[nbRandom].x + SHIP_SIZE / 2 - 4;
 				shot[shot_free].y = ennemi[nbRandom].y + SHIP_SIZE;
 				shot[shot_free].enable = 1;
 				shot[shot_free].direction = DIRECTION_DOWN;
+
 			}
 		}
 

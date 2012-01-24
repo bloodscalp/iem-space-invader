@@ -141,12 +141,15 @@ void new_game(void)
 		{
 			case 0:	printk("Easy\n");
 					difficulty = 1;
+					speed = 0;
 					break;
 			case 1: printk("Medium\n");
 					difficulty = 2;
+					speed = 4;
 					break;
 			case 2: printk("Hard\n");
 					difficulty = 3;
+					speed = 9;
 					break;
 			default:
 					printk("error menu_select\n");
