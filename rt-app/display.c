@@ -197,6 +197,7 @@ extern void refresh(void* cookie)
 					}
 				}
 				player[k].enable++;
+				printk("player.enable: %d\n", player[k].enable);
     		}
     		else if(player[k].enable == 3)
     		{
@@ -208,6 +209,7 @@ extern void refresh(void* cookie)
 					}
 				}
 				player[k].enable++;
+				printk("player.enable: %d\n", player[k].enable);
     		}
     		else if(player[k].enable == 4)
     		{
@@ -219,7 +221,7 @@ extern void refresh(void* cookie)
 					}
 				}
 				player[k].enable = 0;
-				player[k].lifes--;
+				printk("player.enable: %d\n", player[k].enable);
     		}
     	}
 

@@ -13,6 +13,7 @@
 #define EDGE_WEST 4
 #define EDGE_NORTH 0
 #define EDGE_SOUTH LCD_MAX_Y
+#define NB_PLAYER 3
 
 #include <native/task.h>
 #include <native/intr.h>
@@ -65,6 +66,7 @@ void move_ennemi(void* cookie);
 void show_ennemi(void);
 bool detectShitEnable(void);
 void tri_score(void);
+void player_died(void);
 
 extern RT_MUTEX mutex_ennemi;
 extern RT_TASK move_task, ennemi_task, shots_impacts_task, switch_events_task, refresh_task, missile_ennemi_task;

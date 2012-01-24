@@ -29,7 +29,7 @@
 
 
 
-t_player_ player[3];
+t_player_ player[NB_PLAYER];
 
 t_shot_ shot[nbShotsMax];
 
@@ -168,13 +168,13 @@ int game_init(void) {
 		printk("Switch events task start failed: %d\n", err);
 		return -1;
 	}
-
-	err = rt_task_set_priority(&switch_events_task, 99);
+/*
+	err = rt_task_set_priority(&switch_events_task, 5);
 	if (err != 0) {
 		printk("Switch events task set prio failed: %d\n", err);
 		return -1;
 	}
-
+*/
 	rt_mutex_create(&mutex_ennemi, "mutex ennemi");
 
 	return 0;
@@ -297,7 +297,7 @@ void shots_impacts(void * cookie) {
 
 
 				// Si le shot est à la hauteur du joueur
-				if(shot[i].y > (LCD_MAX_Y-20))
+				if((shot[i].y > (LCD_MAX_Y-20)) && (shot[i].direction == 1))
 				{
 					for(j = 0; j < 3; j++)
 					{
@@ -308,13 +308,14 @@ void shots_impacts(void * cookie) {
 							{
 								printk("Player touched\n");
 								player[j].enable++;
+								player[j].lifes--;
 								shot[i].enable = 0;
 							}
 						}
 					}
 				}
 				// Si le shot est dans la zone ennemis
-				else
+				else if((shot[i].y <= (LCD_MAX_Y-20)) && (shot[i].direction == -1))
 				{
 					for(j = 0; j < nbEnnemis; j++)
 					{
@@ -326,6 +327,10 @@ void shots_impacts(void * cookie) {
 							{
 								//printk("Ennemi n°%d touched\n", i);
 								ennemi[j].pv--;
+								if(ennemi[j].pv == 0)
+								{
+									ennemi[j].enable++;
+								}
 								shot[i].enable = 0;
 							}
 						}
@@ -391,6 +396,41 @@ void tri_score(){
 
 }
 
+void player_died()
+{
+	int i, j;
+
+	player[0].enable = 1;
+	player[0].x = LCD_MAX_X / 2 - 8;
+	player[0].y = LCD_MAX_Y - 20;
+
+	for(i = 0; i < nbShotsMax; i++)
+	{
+		shot[i].enable = 0;
+	}
+
+	rt_mutex_lock(&mutex_ennemi, TM_INFINITE);
+
+	// initialisation vaisseaux ennemis
+	for (i = 0; i < nbVagueEnnemis; i++) {
+
+		for (j = 0; j < nbEnnemiParVague; j++) {
+
+			// RÃ©initialise les positions
+			ennemi[i * nbEnnemiParVague + j].x = xStart + (j * (SHIP_SIZE
+					+ X_SPACE));
+			ennemi[i * nbEnnemiParVague + j].y = yStart + (i * (SHIP_SIZE
+					+ Y_SPACE));
+
+		}
+	}
+	rt_mutex_unlock(&mutex_ennemi);
+
+
+}
+
+
+
 // Supprime toutes les tâches créées par game_init
 int end_game(void)
 {
@@ -436,7 +476,15 @@ void game_main(void) {
 		return;
 	}
 
-	while (player[0].lifes > 0) {
+	while(player[0].lifes != 0)
+	{
+		if(player[0].enable == 0)
+		{
+			printk("player died\n");
+			player_died();
+		}
+
+
 		rt_task_wait_period(NULL);
 	}
 
@@ -446,8 +494,5 @@ void game_main(void) {
 		printk("end_game() failed");
 		return;
 	}
-
-
-
 
 }
