@@ -44,7 +44,7 @@ typedef struct t_shot {
 	int enable;
 	int x;
 	int y;
-	int direction; // Up = -1, down = 1
+	int direction;
 } t_shot_;
 
 extern t_ennemi_ ennemi[nbEnnemis];
@@ -67,8 +67,9 @@ void show_ennemi(void);
 bool detectShitEnable(void);
 void tri_score(void);
 void player_died(void);
+void level_up(void);
 
-extern RT_MUTEX mutex_ennemi;
+extern RT_MUTEX mutex_ennemi, mutex_shots;
 extern RT_TASK move_task, ennemi_task, shots_impacts_task, switch_events_task, refresh_task, missile_ennemi_task;
 
 

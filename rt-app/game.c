@@ -48,6 +48,7 @@ unsigned int score;
 unsigned int highScore[10];
 
 RT_MUTEX mutex_ennemi;
+RT_MUTEX mutex_shots;
 RT_TASK move_task, ennemi_task, shots_impacts_task, switch_events_task, refresh_task, missile_ennemi_task;
 
 #define PERIOD_TASK_MOVE 50
@@ -176,6 +177,7 @@ int game_init(void) {
 	}
 */
 	rt_mutex_create(&mutex_ennemi, "mutex ennemi");
+	rt_mutex_create(&mutex_shots, "mutex shots");
 
 	return 0;
 
@@ -425,7 +427,20 @@ void player_died()
 		}
 	}
 	rt_mutex_unlock(&mutex_ennemi);
+}
 
+void level_up()
+{
+	int i;
+
+	speed++;
+
+	ennemi_init();
+
+	for(i = 0; i < nbShotsMax; i++)
+	{
+		shot[i].enable = 0;
+	}
 
 }
 
@@ -471,6 +486,9 @@ int end_game(void)
 
 void game_main(void) {
 
+	int i;
+	int sum;
+
 	if (game_init() < 0) {
 		printk("game_init() failed");
 		return;
@@ -484,6 +502,17 @@ void game_main(void) {
 			player_died();
 		}
 
+		sum = 0;
+
+		for(i = 0; i < nbEnnemis; i++)
+		{
+			sum += ennemi[i].enable;
+		}
+
+		if(sum == 0)
+		{
+			level_up();
+		}
 
 		rt_task_wait_period(NULL);
 	}

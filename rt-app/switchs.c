@@ -25,8 +25,8 @@ void i2c_module_init() {
 void switch_events_handler(void *cookie) {
 
 	int i;
-	int ctr;
 	int err;
+	int shotDone = 0;
 
 	/* Configuration de la tâche périodique */
 	if (TIMER_PERIODIC) {
@@ -48,7 +48,7 @@ void switch_events_handler(void *cookie) {
 		rt_task_wait_period(NULL);
 
 		i = 0;
-		ctr = 0;
+
 
 		/* Vérifie l'état des switchs */
 		check_switch_events_once();
@@ -58,57 +58,46 @@ void switch_events_handler(void *cookie) {
 			SW5_event = 0;
 			SW3_event = 0;
 
-			player[0].lifes++;
-			hp_update_leds();
-
-		}
-
-		/* Nouveau tir */
-		if(SW2_event) {
-			printk("Shot! \n");
-
-			SW2_event = 0;
-
-			/* Parcours le tableau des tirs */
-			while(1) {
-				ctr++;
-
-				/* Si le tir courant est inactif */
-				if(shot[i].enable == 0) {
-					/* L'initialise et l'active */
-					shot[i].x = player[1].x + SHIP_SIZE/2;
-					shot[i].y = player[1].y;
-					shot[i].direction = DIRECTION_UP; // Moves up
-					shot[i].enable = 1;
-					break;
-				} else {
-					/* Pase au tir suivant */
-					i = ((i+1) % NB_MAX_SHOTS);
-
-					/* Si on a parcouru plus de 2 fois le tableau */
-					if(ctr > NB_MAX_SHOTS*2)
-						/* Annule le tir pour éviter de planter les suivants */
-						break;
-				}
-			}
-		}
-
-		if(SW3_event) {
-			SW3_event = 0;
-
-			if(player[0].lifes < 4) {
+			if(player[0].lifes < 4)
+			{
 				player[0].lifes++;
 				hp_update_leds();
 			}
 		}
 
+		/* Nouveau tir */
+		if(SW2_event) {
+			SW2_event = 0;
+
+			/* Parcours le tableau des tirs */
+			for(i=0; i<NB_MAX_SHOTS; i++) {
+
+				rt_mutex_lock(&mutex_shots, TM_INFINITE);
+
+				/* Si le tir courant est inactif */
+				if(shot[i].enable == 0) {
+					/* L'initialise et l'active */
+					shot[i].x = player[0].x + SHIP_SIZE/2;
+					shot[i].y = player[0].y;
+					shot[i].direction = DIRECTION_UP; // Moves up
+					shot[i].enable = 1;
+					shotDone = 1;
+					break;
+				}
+				rt_mutex_unlock(&mutex_shots);
+			}
+
+			if(!shotDone) {
+				printk("Error, shot not done \n");
+			}
+		}
+
+		if(SW3_event) {
+			SW3_event = 0;
+		}
+
 		if(SW4_event) {
 			SW4_event = 0;
-
-			if(player[0].lifes > 0) {
-				player[0].lifes--;
-				hp_update_leds();
-			}
 		}
 	}
 }
