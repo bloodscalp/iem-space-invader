@@ -77,11 +77,32 @@ int game_init(void) {
 		shot[i].enable = 0;
 	}
 
+	for(i = 0; i < nbEnnemis; i++)
+	{
+		ennemi[i].enable = 1;
+	}
+
 	hp_update_leds();
 
-	rt_mutex_create(&mutex_ennemi, "mutex ennemi");
-	rt_mutex_create(&mutex_shots, "mutex shots");
-	rt_mutex_create(&mutex_score, "mutex score");
+	err = rt_mutex_create(&mutex_ennemi, "mutex ennemi");
+	if (err != 0) {
+		printk("mutex ennemi creation failed: %d\n", err);
+		return -1;
+	}
+
+
+	err = rt_mutex_create(&mutex_shots, "mutex shots");
+	if (err != 0) {
+		printk("mutex shots creation failed: %d\n", err);
+		return -1;
+	}
+
+	err = rt_mutex_create(&mutex_score, "mutex score");
+	if (err != 0) {
+		printk("mutex score creation failed: %d\n", err);
+		return -1;
+	}
+
 
 	// Création de la tâche gérant le rafraichissement de l'écran
 	err = rt_task_create(&refresh_task, "refresh", STACK_SIZE, 50, 0);
@@ -112,6 +133,13 @@ int game_init(void) {
 		printk("move player start failed: %d\n", err);
 		return -1;
 	}
+
+	err = rt_task_set_priority(&move_task, 80);
+	if (err < 0) {
+		printk("Switch events task set prio failed: %d\n", err);
+		return -1;
+	}
+
 
 	// Création de la tâche gérant le déplacement des vaisseaux ennemis
 	err = rt_task_create(&ennemi_task, "move_ennemi", STACK_SIZE, 50, 0);
@@ -296,14 +324,14 @@ void shots_impacts(void * cookie) {
 
 	// Configuration de la tâche périodique
 	if (TIMER_PERIODIC) {
-		err = rt_task_set_periodic(&shots_impacts_task, TM_NOW, PERIOD_TASK_MOVE);
+		err = rt_task_set_periodic(&shots_impacts_task, TM_NOW, PERIOD_TASK_SHOT);
 		if (err != 0) {
 			printk("Shots and impacts task set periodic failed: %d\n", err);
 			return;
 		}
 
 	} else {
-		err = rt_task_set_periodic(&shots_impacts_task, TM_NOW, PERIOD_TASK_MOVE * MS);
+		err = rt_task_set_periodic(&shots_impacts_task, TM_NOW, PERIOD_TASK_SHOT * MS);
 		if (err != 0) {
 			printk("Shots and impacts task set periodic failed: %d\n", err);
 			return;
@@ -466,6 +494,8 @@ void level_up()
 {
 	int i;
 
+	printk("LEVEL UP\n");
+
 	speed++;
 
 	ennemi_init();
@@ -528,9 +558,23 @@ int end_game(void)
 		return -1;
 	}
 
-	rt_mutex_delete(&mutex_ennemi);
-	rt_mutex_delete(&mutex_shots);
-	rt_mutex_delete(&mutex_score);
+	err = rt_mutex_delete(&mutex_ennemi);
+	if (err != 0) {
+		printk("delete mutex ennemi failed: %d\n", err);
+		return -1;
+	}
+
+	err = rt_mutex_delete(&mutex_shots);
+	if (err != 0) {
+			printk("delete mutex shots failed: %d\n", err);
+			return -1;
+	}
+
+	err = rt_mutex_delete(&mutex_score);
+	if (err != 0) {
+			printk("delete mutex score failed: %d\n", err);
+			return -1;
+	}
 
 	return 0;
 
@@ -549,6 +593,8 @@ void game_main(void) {
 
 	while(player[0].lifes > 0)
 	{
+		rt_task_wait_period(NULL);
+
 		if(player[0].enable == 0)
 		{
 			//printk("player died\n");
@@ -568,7 +614,6 @@ void game_main(void) {
 			level_up();
 		}
 
-		rt_task_wait_period(NULL);
 	}
 
 	tri_score();

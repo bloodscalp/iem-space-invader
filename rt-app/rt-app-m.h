@@ -16,12 +16,13 @@
 #define PERIOD_TASK_ENNEMI 	40
 #define PERIOD_TASK_REFRESH 40
 #define PERIOD_TASK_MISSILE_ENNEMI 250
-#define PERIOD_TASK_GIFT 100
+#define PERIOD_TASK_GIFT 50
+#define PERIOD_TASK_SHOT 25
 
 #define nbEnnemis 24
 #define nbVagueEnnemis 4
 #define nbEnnemiParVague (nbEnnemis/nbVagueEnnemis)
-#define SHOT_SPEED 2
+#define SHOT_SPEED 1
 #define DIRECTION_EST 1
 #define DIRECTION_OUEST -1
 #define DIRECTION_UP -SHOT_SPEED
