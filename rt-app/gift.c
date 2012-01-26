@@ -35,7 +35,7 @@ void gift_weapon(void *cookie) {
 		}
 	}
 	while (1) {
-		if (((speed % GIFTEVERYLEVEL) == 0 ) || (gift.y <= EDGE_NORTH)) {
+		if (((speed % GIFTEVERYLEVEL) == 0 || gift.y <= EDGE_NORTH)) {
 			if ((gift.enable == 0) && (tmpSpeed != speed)) {
 				tmpSpeed = speed;
 
@@ -57,8 +57,8 @@ void gift_weapon(void *cookie) {
 				if (touchPlayer()) {
 					gift.enable = 0;
 
-					// TODO: ajoute les deux alliers
-					//reinforcement_handler();
+					// TODO: ajoute les deux alliés
+					reinforcement_handler();
 
 					printk("Bonus obtenu\n");
 				}
