@@ -70,6 +70,8 @@ int game_init(void) {
 	player[0].y = LCD_MAX_Y - 20;
 	player[0].lifes = MAX_HP;
 
+	gift.enable = 0;
+
 	for(i = 0; i < NB_MAX_SHOTS; i++)
 	{
 		shot[i].enable = 0;
@@ -225,6 +227,9 @@ void move_player(void * cookie) {
 	int touch = 0;
 	struct ts_sample touch_info;
 	int speed = 5;
+	int maxLeft, maxRight;
+
+	maxLeft = maxRight = 0;
 
 	// Configuration de la tâche périodique
 	if (TIMER_PERIODIC) {
@@ -252,12 +257,24 @@ void move_player(void * cookie) {
 				printk("x = %d, y = %d\n", touch_info.x, touch_info.y);
 				touch = 1;
 
+
 				for(i=0; i<NB_PLAYER; i++) {
-					if (touch_info.x > player[i].x) {
-						if (player[i].x + 16 < EdgeX_right)
+					if(player[i].enable) {
+						if(i%2)
+							maxRight = i;
+						else
+							maxLeft = i;
+					}
+				}
+
+				if (touch_info.x > player[0].x) {
+					if (player[maxRight].x + 16 < EdgeX_right) {
+						for(i=0; i<NB_PLAYER; i++)
 							player[i].x += speed;
-					} else {
-						if (player[i].x > EdgeX_left)
+					}
+				} else if(touch_info.x < player[0].x) {
+					if (player[maxLeft].x > EdgeX_left) {
+						for(i=0; i<NB_PLAYER; i++)
 							player[i].x -= speed;
 					}
 				}
@@ -463,9 +480,9 @@ void level_up()
 
 	ennemi_init();
 
-	for(i=1; i<NB_PLAYER; i++) {
-		player[i].enable = 0;
-	}
+//	for(i=1; i<NB_PLAYER; i++) {
+//		player[i].enable = 0;
+//	}
 
 	for(i = 0; i < NB_MAX_SHOTS; i++)
 	{
