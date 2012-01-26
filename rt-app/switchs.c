@@ -13,6 +13,7 @@
 #include "switchs.h"
 
 int SW2_event, SW3_event, SW4_event, SW5_event;
+int SW2_up, SW2_up_cpt;
 
 /*
 void i2c_module_init() {
@@ -43,6 +44,8 @@ void switch_events_handler(void *cookie) {
 		}
 	}
 
+	SW2_up_cpt = 0;
+
 	while(1) {
 		rt_task_wait_period(NULL);
 
@@ -62,6 +65,16 @@ void switch_events_handler(void *cookie) {
 				player[0].lifes++;
 				hp_update_leds();
 			}
+		}
+
+		/* Nouveau tir */
+		if(SW2_up) {
+			SW2_up = 0;
+
+			SW2_up_cpt = (SW2_up_cpt+1) % FREQENCE_TIR_AUTO;
+
+			if(SW2_up_cpt == 0)
+				player_shots_handler();
 		}
 
 		/* Nouveau tir */
@@ -86,40 +99,47 @@ void switch_events_handler(void *cookie) {
 
 void check_switch_events_once(void) {
 
-	char buf[1];
-	static char lastBuf[1];
+	char buf;
+	static char lastBuf;
 	int err;
 
 	char switch_change, switch_change_up;
 
 	/* Lis la valeur des switchs */
-	if((err = pca9554_read(NULL, buf, 1, NULL)) < 0) {
+	if((err = pca9554_read(NULL, &buf, 1, NULL)) < 0) {
 		printk("i2c read error : %d\n", err);
-	} else if(buf[0] != lastBuf[0]) {
+	} else {
 
-		/* Analyse s'il y a eu un changement (rise) */
-		switch_change = (buf[0] ^ lastBuf[0]) >> 4;
-		switch_change_up = switch_change & (buf[0] >> 4);
-
-
-		/* Met à jour les event flags selon les switchs */
-		if(switch_change_up & 0x1) {
-			SW5_event = 1;
+		if((buf >> 4) & 0x8) {
+			SW2_up = 1;
+			printk("SW2 up\n");
 		}
 
-		if(switch_change_up & 0x2) {
-			SW4_event = 1;
-		}
+		if(buf != lastBuf) {
 
-		if(switch_change_up & 0x4) {
-			SW3_event = 1;
-		}
+			/* Analyse s'il y a eu un changement (rise) */
+			switch_change = (buf ^ lastBuf) >> 4;
+			switch_change_up = switch_change & (buf >> 4);
 
-		if(switch_change_up & 0x8) {
-			SW2_event = 1;
-		}
+			/* Met à jour les event flags selon les switchs */
+			if(switch_change_up & 0x1) {
+				SW5_event = 1;
+			}
 
-		/* Mémorise l'état présent */
-		lastBuf[0] = buf[0];
+			if(switch_change_up & 0x2) {
+				SW4_event = 1;
+			}
+
+			if(switch_change_up & 0x4) {
+				SW3_event = 1;
+			}
+
+			if(switch_change_up & 0x8) {
+				SW2_event = 1;
+			}
+
+			/* Mémorise l'état présent */
+			lastBuf = buf;
+		}
 	}
 }

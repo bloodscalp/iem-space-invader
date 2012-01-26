@@ -38,6 +38,8 @@
 #define ALLIED_SHIPS_HP 		1
 #define NB_PLAYER 				3
 
+#define FREQENCE_TIR_AUTO		10
+
 #define STEP_MOVE_ENNEMI 4
 
 #define NB_MAX_SHOTS 256
