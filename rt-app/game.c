@@ -79,6 +79,10 @@ int game_init(void) {
 
 	hp_update_leds();
 
+	rt_mutex_create(&mutex_ennemi, "mutex ennemi");
+	rt_mutex_create(&mutex_shots, "mutex shots");
+	rt_mutex_create(&mutex_score, "mutex score");
+
 	// Création de la tâche gérant le rafraichissement de l'écran
 	err = rt_task_create(&refresh_task, "refresh", STACK_SIZE, 50, 0);
 	if (err != 0) {
@@ -170,17 +174,7 @@ int game_init(void) {
 		return -1;
 	}
 
-	/* Initialisation de l'interface i2c */
-//	if(err = pca9554_init() < 0) {
-//		printk("pca 9554 init failed: %d\n", err);
-//		return -1;
-//	}
 
-	/* Initialisation des switchs
-	if(switchs_init() < 0)
-		return -1;
-
- */
 	// Création de la tâche gérant les switchs
 	err =  rt_task_create (&switch_events_task, "switch_events", STACK_SIZE, 50, 0);
 	if (err != 0) {
@@ -195,16 +189,12 @@ int game_init(void) {
 		printk("Switch events task start failed: %d\n", err);
 		return -1;
 	}
-/*
-	err = rt_task_set_priority(&switch_events_task, 5);
-	if (err != 0) {
+
+	err = rt_task_set_priority(&switch_events_task, 99);
+	if (err < 0) {
 		printk("Switch events task set prio failed: %d\n", err);
 		return -1;
 	}
-*/
-	rt_mutex_create(&mutex_ennemi, "mutex ennemi");
-	rt_mutex_create(&mutex_shots, "mutex shots");
-	rt_mutex_create(&mutex_score, "mutex score");
 
 	return 0;
 
@@ -229,8 +219,6 @@ void move_player(void * cookie) {
 	struct ts_sample touch_info;
 	int speed = 5;
 	int maxLeft, maxRight;
-
-	maxLeft = maxRight = 0;
 
 	// Configuration de la tâche périodique
 	if (TIMER_PERIODIC) {
@@ -258,6 +246,7 @@ void move_player(void * cookie) {
 				//printk("x = %d, y = %d\n", touch_info.x, touch_info.y);
 				touch = 1;
 
+				maxLeft = maxRight = 0;
 
 				for(i=0; i<NB_PLAYER; i++) {
 					if(player[i].enable) {

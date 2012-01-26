@@ -156,8 +156,10 @@ void move_ennemi(void* cookie) {
 	printk("*************************************************\n");
 
 	//initialisation des vaisseaux ennemis
-	if (ennemi_init() < 0)
+	if (ennemi_init() < 0) {
+		printk("Error on ennemi init\n");
 		return;
+	}
 
 	// Test
 	//show_ennemi();
