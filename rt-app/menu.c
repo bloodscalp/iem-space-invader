@@ -1,3 +1,14 @@
+/*
+ * Nom : menu.c
+ *
+ * Auteur : Sylvain Villet & Duployer Florent
+ *
+ * But : Contient les différentes fonctions propres au menu, tels
+ * 		 que l'affichage, la gestion de la saisie, et les affichages
+ * 		 des highscores et du About.
+ *
+ */
+
 #include <linux/module.h>
 
 #include <native/task.h>
@@ -24,9 +35,14 @@ const int Xstart = 15;
 int Xaffichage = 15;
 int espacement = 15;
 
+/*
+ * Auteur : Sylvain Villet & Duployer Florent
+ *
+ * But : Affichage du menu, en fonction d'une liste de menu en argument,
+ * 		 du nombre de menu à afficher, et d'un titre de menu
+ */
 void menu_display(char ** menu, const int nbMenu, char* title)
 {
-
 	int Xaffichage = Xstart;
 	int Yaffichage = Ystart;
 	int tailleDegrade = 5;
@@ -36,9 +52,10 @@ void menu_display(char ** menu, const int nbMenu, char* title)
 	// Background Black
 	fb_rect_fill(0, LCD_MAX_Y-1, 0, LCD_MAX_X-1, 0);
 
+	// Affichage du titre en haut de l'écran
 	fb_print_string(0xFFFF, 0, title, 60, 15);
 
-	// Affichage du menu
+	// Affichage du menu en fonction du nombre de menu désiré
 	for(i = 0; i < nbMenu; i++)
 	{
 		for(j = 0x1F; j > 0; j--)
@@ -48,16 +65,17 @@ void menu_display(char ** menu, const int nbMenu, char* title)
 		}
 
 		Xaffichage = Xstart;
-
 		fb_print_string(0xFFFF, BLUE(0x1F), menu[i], Xstart+10, Yaffichage + (WinSizeY/2) - 4);
-
 		Yaffichage += WinSizeY + espacement;
 	}
-
 	return;
 }
 
-
+/*
+ * Auteur : Sylvain Villet
+ *
+ * But : Fonction qui retourne le menu sélectionner avec le touchscreen
+ */
 int menu_select(int nbMenu)
 {
 	int err;
@@ -73,7 +91,6 @@ int menu_select(int nbMenu)
 			printk("Menu task set periodic failed: %d\n", err);
 			return -1;
 		}
-
 	}
 	else
 	{
@@ -110,21 +127,23 @@ int menu_select(int nbMenu)
 					return i;
 				}
 			}
-
 		}
-
 		touch = 0;
-
     }
 
 	return -1;
 }
 
+/*
+ * Auteur : Sylvain Villet
+ *
+ * But : Affiche du menu des difficultés, et lancement du jeu dès qu'il
+ * 		 y'a acquisition de la difficulté
+ */
 void new_game(void)
 {
 	char *menu[3] = {"Easy", "Medium", "Hard"};
 	char *titre = "DIFFICULTY";
-
 
 	difficulty = 0;
 
@@ -160,11 +179,14 @@ void new_game(void)
 	game_main();
 
 	rt_task_wait_period(NULL);
-
-
 }
 
-
+/*
+ * Auteur : Duployer Florent
+ *
+ * But : Affichage des highscores (stockés en RAM), avec option de retour
+ * 		 au menu principal
+ */
 void highscore(void)
 {
 	char *menu[1] = {"Return to main menu"};
@@ -195,9 +217,7 @@ void highscore(void)
 		fb_print_string(RED(0x1F), 0, affichage, x + sizeWinNo + 6, y + 6);
 
 		y += sizeWinNo + 8;
-
 	}
-
 
 	while(retour == 0){
 
@@ -211,13 +231,16 @@ void highscore(void)
 					printk("error menu_select\n");
 					break;
 		}
-
 	}
 
 	return;
-
 }
-
+/*
+ * Auteur : Duployer Florent
+ *
+ * But : Affichage de quelques informations concernant le projet
+ *		 Option de retour au menu principale.
+ */
 void about(void)
 {
 	char *menu[1] = {"Return to main menu"};
@@ -271,11 +294,13 @@ void about(void)
 	}
 
 	return;
-
-
 }
 
-
+/*
+ * Auteur : Sylvain Villet & Duployer Florent
+ *
+ * But : Fonction du menu principale
+ */
 void menu(void* cookie)
 {
 	char *menu[3] = {"New Game", "High Scores", "About"};
@@ -288,8 +313,7 @@ void menu(void* cookie)
 		highScore[i] = 0;
 	}
 
-
-	printk("Start menu\n");
+	//	printk("Start menu\n");
 
 	while(1){
 
@@ -300,17 +324,17 @@ void menu(void* cookie)
 		// correspondante Ã  son choix
 		switch(menu_select(3))
 		{
-			case 0:	printk("new_game()\n");
+			case 0:	// printk("new_game()\n");
 					new_game();
 					break;
-			case 1: printk("highscore()\n");
+			case 1: // printk("highscore()\n");
 					highscore();
 					break;
-			case 2: printk("About()\n");
+			case 2: // printk("About()\n");
 					about();
 					break;
 			default:
-					printk("error menu_select\n");
+					//printk("error menu_select\n");
 					break;
 		}
 
