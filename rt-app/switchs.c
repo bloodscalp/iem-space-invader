@@ -87,7 +87,7 @@ void switch_events_handler(void *cookie) {
 		if(SW3_event) {
 			SW3_event = 0;
 
-			reinforcement_handler();
+			//reinforcement_handler();
 		}
 
 		if(SW4_event) {
@@ -112,7 +112,6 @@ void check_switch_events_once(void) {
 
 		if((buf >> 4) & 0x8) {
 			SW2_up = 1;
-			printk("SW2 up\n");
 		}
 
 		if(buf != lastBuf) {

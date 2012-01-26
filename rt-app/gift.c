@@ -35,7 +35,7 @@ void gift_weapon(void *cookie) {
 		}
 	}
 	while (1) {
-		if (((speed % GIFTEVERYLEVEL) == 0 || gift.y <= EDGE_NORTH)) {
+		if ((speed % GIFTEVERYLEVEL) == 0 ) {
 			if ((gift.enable == 0) && (tmpSpeed != speed)) {
 				tmpSpeed = speed;
 
@@ -60,16 +60,34 @@ void gift_weapon(void *cookie) {
 					// TODO: ajoute les deux alliés
 					reinforcement_handler();
 
-					printk("Bonus obtenu\n");
+					//printk("Bonus obtenu\n");
 				}
 				// Detection : cadeau touche player
 				if (touchGround()) {
 					gift.enable = 0;
-					printk("Bonus perdu\n");
+					//printk("Bonus perdu\n");
 				}
 			}
 
-		} else {
+		} else if( (tmpSpeed == speed-1) && (gift.y > EDGE_NORTH)) {
+			// se deplace verticalement
+			gift.y = gift.y + STEP_GIFT;
+			// Detection : cadeau touche player
+			if (touchPlayer()) {
+				gift.enable = 0;
+
+				// TODO: ajoute les deux alliés
+				reinforcement_handler();
+
+				//printk("Bonus obtenu\n");
+			}
+			// Detection : cadeau touche player
+			if (touchGround()) {
+				gift.enable = 0;
+				//printk("Bonus perdu\n");
+			}
+		}
+		else {
 			gift.enable = 0;
 		}
 		rt_task_wait_period(NULL);

@@ -254,7 +254,7 @@ void move_player(void * cookie) {
 			rt_task_wait_period(NULL);
 
 			if (xeno_ts_read(&touch_info, 1, O_NONBLOCK) > 0) {
-				printk("x = %d, y = %d\n", touch_info.x, touch_info.y);
+				//printk("x = %d, y = %d\n", touch_info.x, touch_info.y);
 				touch = 1;
 
 
@@ -283,7 +283,7 @@ void move_player(void * cookie) {
 			}
 		}
 
-		printk("x_player = %d \n", player[0].x);
+		//printk("x_player = %d \n", player[0].x);
 
 		rt_task_wait_period(NULL);
 
@@ -349,7 +349,7 @@ void shots_impacts(void * cookie) {
 							// S'il y a une collision avec le joueur
 							if((shot[i].x > player[j].x) && (shot[i].x < (player[j].x + 16)))
 							{
-								printk("Player touched\n");
+								//printk("Player touched\n");
 								player[j].enable++;
 								shot[i].enable = 0;
 							}
@@ -561,9 +561,9 @@ void game_main(void) {
 	{
 		if(player[0].enable == 0)
 		{
-			printk("player died\n");
+			//printk("player died\n");
 			player_died();
-			printk("player lifes: %d\n", player[0].lifes);
+			//printk("player lifes: %d\n", player[0].lifes);
 		}
 
 		sum = 0;

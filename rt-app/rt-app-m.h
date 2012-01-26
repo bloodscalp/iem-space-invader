@@ -16,7 +16,7 @@
 #define PERIOD_TASK_ENNEMI 	40
 #define PERIOD_TASK_REFRESH 40
 #define PERIOD_TASK_MISSILE_ENNEMI 250
-#define PERIOD_TASK_GIFT 500
+#define PERIOD_TASK_GIFT 100
 
 #define nbEnnemis 24
 #define nbVagueEnnemis 4
@@ -39,7 +39,7 @@
 #define ALLIED_SHIPS_SPACING 	20
 #define ALLIED_SHIPS_HP 		1
 #define NB_PLAYER 				3
-#define STEP_GIFT 10
+#define STEP_GIFT 				2
 #define GIFTEVERYLEVEL 2
 
 #define CAPLVL_INITIALE			1
