@@ -165,7 +165,7 @@ void new_game(void)
 }
 
 
-void top10(void)
+void highscore(void)
 {
 	char *menu[1] = {"Return to main menu"};
 	char *titre = "HIGH SCORES";
@@ -183,7 +183,7 @@ void top10(void)
 	menu_display(menu, 1, titre);
 
 	// Affichage des scores
-	for(i = 0; i < 10; i++)
+	for(i = 0; i < 5; i++)
 	{
 		// Affichage du Numéro du score
 		fb_rect_fill(y, y+sizeWinNo, x+1, x + sizeWinNo, 0xFFFF);
@@ -194,7 +194,7 @@ void top10(void)
 		sprintf(affichage, "%d", highScore[i]);
 		fb_print_string(RED(0x1F), 0, affichage, x + sizeWinNo + 6, y + 6);
 
-		y += sizeWinNo + 3;
+		y += sizeWinNo + 8;
 
 	}
 
@@ -216,7 +216,61 @@ void top10(void)
 
 	return;
 
+}
 
+void about(void)
+{
+	char *menu[1] = {"Return to main menu"};
+	char *titre = "ABOUT";
+
+	int retour = 0;
+	int x = Xstart;
+	int y = Ystart + WinSizeY + 15;
+
+	// Affichage du menu
+	menu_display(menu, 1, titre);
+
+	fb_print_string(0xFFFF, 0, "Developpers :", x, y);
+	x += 20; y += 20;
+	fb_print_string(RED(0x1F), 0,"Christian Muller", x, y);
+    y += 10;
+	fb_print_string(RED(0x1F), 0,"Florent Duployer", x, y);
+    y += 10;
+	fb_print_string(RED(0x1F), 0,"Romain Failletaz", x, y);
+    y += 10;
+	fb_print_string(RED(0x1F), 0,"Sylvain Villet", x, y);
+
+	x = Xstart;
+	y += 20;
+
+	fb_print_string(0xFFFF, 0,"Project made for", x, y);
+	y += 10;
+	fb_print_string(0xFFFF, 0,"the IEM course", x, y);
+	y += 20;
+	fb_print_string(0xFFFF, 0, "Professor :", x, y);
+	x += 20; y += 20;
+	fb_print_string(RED(0x1F), 0,"Daniel Rossier", x, y);
+	x = Xstart;
+    y += 20;
+	fb_print_string(0xFFFF, 0, "Assist :", x, y);
+	x += 20; y += 20;
+	fb_print_string(RED(0x1F), 0,"Lionel Sambuc", x, y);
+
+	while(retour == 0){
+
+		// Attend que l'utilisateur touche l'écran et lance la fonction
+		// correspondante à son choix
+		switch(menu_select(1))
+		{
+			case 0:	retour = 1;
+					break;
+			default:
+					printk("error menu_select\n");
+					break;
+		}
+	}
+
+	return;
 
 
 }
@@ -224,7 +278,7 @@ void top10(void)
 
 void menu(void* cookie)
 {
-	char *menu[3] = {"New Game", "Top 10", "About"};
+	char *menu[3] = {"New Game", "High Scores", "About"};
 	char *titre = "SPACE INVADERS";
 
 	// Reset des highscores au démarrage
@@ -249,10 +303,11 @@ void menu(void* cookie)
 			case 0:	printk("new_game()\n");
 					new_game();
 					break;
-			case 1: printk("top10()\n");
-					top10();
+			case 1: printk("highscore()\n");
+					highscore();
 					break;
 			case 2: printk("About()\n");
+					about();
 					break;
 			default:
 					printk("error menu_select\n");

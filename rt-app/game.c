@@ -523,6 +523,7 @@ int end_game(void)
 
 	rt_mutex_delete(&mutex_ennemi);
 	rt_mutex_delete(&mutex_shots);
+	rt_mutex_delete(&mutex_score);
 
 	return 0;
 
