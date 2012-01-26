@@ -1,13 +1,9 @@
 /*
- * menu.h
+ * Nom : menu.h
  *
- *  Created on: 20 déc. 2011
- *      Author: redsuser
+ * Auteurs : Sylvain Villet & Florent Duployer
+ *
  */
-
-
-
-
 extern RT_TASK menu_task;
 
 int menu_select(int nbMenu);
