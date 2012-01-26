@@ -204,6 +204,7 @@ int game_init(void) {
 */
 	rt_mutex_create(&mutex_ennemi, "mutex ennemi");
 	rt_mutex_create(&mutex_shots, "mutex shots");
+	rt_mutex_create(&mutex_score, "mutex score");
 
 	return 0;
 
