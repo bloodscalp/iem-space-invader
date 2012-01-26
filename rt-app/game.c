@@ -26,6 +26,7 @@
 #include "ennemi.h"
 #include "switchs.h"
 #include "missileEnnemi.h"
+#include "gift.h"
 
 
 
@@ -39,6 +40,8 @@ t_ennemi_ ennemi[nbEnnemis];
 
 t_ennemi_ ennemi_y_tab[nbEnnemis/nbVagueEnnemis];
 
+t_gift_ gift;
+
 unsigned int speed;
 
 // 1 = easy, 2 = medium, 3 = hard
@@ -50,7 +53,7 @@ unsigned int highScore[10];
 RT_MUTEX mutex_ennemi;
 RT_MUTEX mutex_shots;
 RT_MUTEX mutex_score;
-RT_TASK move_task, ennemi_task, shots_impacts_task, switch_events_task, refresh_task, missile_ennemi_task, score_task;
+RT_TASK move_task, ennemi_task, shots_impacts_task, switch_events_task, refresh_task, missile_ennemi_task, score_task, gift_task;
 
 #define PERIOD_TASK_MOVE 50
 
@@ -147,6 +150,21 @@ int game_init(void) {
 	err = rt_task_start(&missile_ennemi_task, missile_ennemi, 0);
 	if (err != 0) {
 		printk("Shots ennemi task start failed: %d\n", err);
+		return -1;
+	}
+
+	// Création de la tâche gérant le gift
+	err =  rt_task_create (&gift_task, "gift", STACK_SIZE, 50, 0);
+	if (err != 0) {
+		printk("gift task creation failed: %d\n", err);
+		return -1;
+	}
+
+	printk("gift task created\n");
+
+	err = rt_task_start(&gift_task, gift_weapon, 0);
+	if (err != 0) {
+		printk("gift task start failed: %d\n", err);
 		return -1;
 	}
 
@@ -494,6 +512,12 @@ int end_game(void)
 	err = rt_task_delete(&switch_events_task);
 	if (err != 0) {
 		printk("delete switch_events task failed: %d\n", err);
+		return -1;
+	}
+
+	err = rt_task_delete(&gift_task);
+	if (err != 0) {
+		printk("delete gift task failed: %d\n", err);
 		return -1;
 	}
 

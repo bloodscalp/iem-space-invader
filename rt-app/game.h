@@ -46,11 +46,18 @@ typedef struct t_shot {
 	int direction;
 } t_shot_;
 
+typedef struct t_gift {
+	int enable;
+	int x;
+	int y;
+} t_gift_;
+
 extern t_ennemi_ ennemi[nbEnnemis];
 extern t_ennemi_ ennemi_y_tab[nbEnnemis/nbVagueEnnemis];
 extern t_player_ player[NB_PLAYER];
 extern t_shot_ shot[NB_MAX_SHOTS];
 extern t_shot_ shot_ennemi[NB_MAX_SHOTS];
+extern t_gift_ gift;
 
 extern unsigned int difficulty;
 extern unsigned int score;
@@ -71,7 +78,7 @@ void reinforcement_handler(void);
 void player_shots_handler(void);
 
 extern RT_MUTEX mutex_ennemi, mutex_shots, mutex_score;
-extern RT_TASK move_task, ennemi_task, shots_impacts_task, switch_events_task, refresh_task, missile_ennemi_task;
+extern RT_TASK move_task, ennemi_task, shots_impacts_task, switch_events_task, refresh_task, missile_ennemi_task, gift_task;
 
 
 

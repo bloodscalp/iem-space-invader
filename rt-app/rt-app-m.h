@@ -16,6 +16,7 @@
 #define PERIOD_TASK_ENNEMI 	40
 #define PERIOD_TASK_REFRESH 40
 #define PERIOD_TASK_MISSILE_ENNEMI 250
+#define PERIOD_TASK_GIFT 500
 
 #define nbEnnemis 24
 #define nbVagueEnnemis 4
@@ -26,6 +27,7 @@
 #define DIRECTION_UP -SHOT_SPEED
 #define DIRECTION_DOWN SHOT_SPEED
 #define SHIP_SIZE 16
+#define GIFT_SIZE 16
 #define MISSILE_SIZE 2
 #define DEFAULT_PV_ENNEMI 1
 #define MOVE_MISSILE 1
@@ -37,6 +39,8 @@
 #define ALLIED_SHIPS_SPACING 	20
 #define ALLIED_SHIPS_HP 		1
 #define NB_PLAYER 				3
+#define STEP_GIFT 10
+#define GIFTEVERYLEVEL 2
 
 #define FREQENCE_TIR_AUTO		10
 
