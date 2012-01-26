@@ -42,6 +42,15 @@
 #define STEP_GIFT 10
 #define GIFTEVERYLEVEL 2
 
+#define CAPLVL_INITIALE			1
+#define CAP_LEVEL_1				5
+#define CAP_LEVEL_2				10
+#define CAP_LEVEL_3				15
+#define ENNEMY_HP_CAP_1			1
+#define ENNEMY_HP_CAP_2			2
+#define ENNEMY_HP_CAP_3			3
+#define ENNEMY_HP_CAP_4			4
+
 #define FREQENCE_TIR_AUTO		10
 
 #define STEP_MOVE_ENNEMI 4
