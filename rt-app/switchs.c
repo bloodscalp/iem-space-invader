@@ -23,6 +23,11 @@ void i2c_module_init() {
 }
 */
 
+/**
+ * Auteur : Christian Muller
+ *
+ * Tâche qui va lire l'état des switchs et lancer les fonctions associées
+ */
 void switch_events_handler(void *cookie) {
 
 	int i;
@@ -44,6 +49,7 @@ void switch_events_handler(void *cookie) {
 		}
 	}
 
+	/* Compteur indiquant depuis combien de temps le switch 2 est appuyé */
 	SW2_up_cpt = 0;
 
 	while(1) {
@@ -55,7 +61,7 @@ void switch_events_handler(void *cookie) {
 		/* Vérifie l'état des switchs */
 		check_switch_events_once();
 
-		/* This is a cheat :p */
+		/* This is a cheat! Ca ajoute une vie si on presse 3 et 5 en même temps :p */
 		if(SW5_event && SW3_event) {
 			SW5_event = 0;
 			SW3_event = 0;
@@ -67,7 +73,7 @@ void switch_events_handler(void *cookie) {
 			}
 		}
 
-		/* Nouveau tir */
+		/* Tir automatique avec une période inférieure au tir manuel */
 		if(SW2_up) {
 			SW2_up = 0;
 
@@ -84,9 +90,9 @@ void switch_events_handler(void *cookie) {
 			player_shots_handler();
 		}
 
+		/* Switchs 3 et 4 ne font rien */
 		if(SW3_event) {
 			SW3_event = 0;
-
 			//reinforcement_handler();
 		}
 
@@ -110,13 +116,15 @@ void check_switch_events_once(void) {
 		printk("i2c read error : %d\n", err);
 	} else {
 
+		/* Indique si le switch 2 est pressé */
 		if((buf >> 4) & 0x8) {
 			SW2_up = 1;
 		}
 
+		/* S'il y a eu un changement */
 		if(buf != lastBuf) {
 
-			/* Analyse s'il y a eu un changement (rise) */
+			/* Détécte les changements (rise) */
 			switch_change = (buf ^ lastBuf) >> 4;
 			switch_change_up = switch_change & (buf >> 4);
 
@@ -124,15 +132,12 @@ void check_switch_events_once(void) {
 			if(switch_change_up & 0x1) {
 				SW5_event = 1;
 			}
-
 			if(switch_change_up & 0x2) {
 				SW4_event = 1;
 			}
-
 			if(switch_change_up & 0x4) {
 				SW3_event = 1;
 			}
-
 			if(switch_change_up & 0x8) {
 				SW2_event = 1;
 			}

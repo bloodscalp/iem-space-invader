@@ -2,7 +2,7 @@
  * switchs.h
  *
  *  Created on: 19 janv. 2012
- *      Author: redsuser
+ *      Author: Christian Muller
  */
 
 #ifndef SWITCHS_H_

@@ -218,6 +218,7 @@ int game_init(void) {
 		return -1;
 	}
 
+	/* Attribution d'un priorité plus élevée pour la lecture sur le bus i2c */
 	err = rt_task_set_priority(&switch_events_task, 99);
 	if (err < 0) {
 		printk("Switch events task set prio failed: %d\n", err);
@@ -229,12 +230,6 @@ int game_init(void) {
 
 }
 
-
-int switchs_init(void) {
-
-
-	return 0;
-}
 
 void move_player(void * cookie) {
 
@@ -276,6 +271,7 @@ void move_player(void * cookie) {
 
 				maxLeft = maxRight = 0;
 
+				/* Détecte quels vaisseaux sont au extrêmités */
 				for(i=0; i<NB_PLAYER; i++) {
 					if(player[i].enable) {
 						if(i%2)
@@ -285,11 +281,14 @@ void move_player(void * cookie) {
 					}
 				}
 
+				/* Déplacment solidaire des vaisseaux */
+				/* Droite */
 				if (touch_info.x > player[0].x) {
 					if (player[maxRight].x + 16 < EdgeX_right) {
 						for(i=0; i<NB_PLAYER; i++)
 							player[i].x += speed;
 					}
+				/* Gauche */
 				} else if(touch_info.x < player[0].x) {
 					if (player[maxLeft].x > EdgeX_left) {
 						for(i=0; i<NB_PLAYER; i++)
@@ -310,8 +309,6 @@ void move_player(void * cookie) {
 	}
 
 }
-
-
 
 
 /**
@@ -343,9 +340,8 @@ void shots_impacts(void * cookie) {
 
 		/* Parcours la liste des tirs */
 		for(i=0; i<NB_MAX_SHOTS; i++) {
-			if(shot[i].enable == 1)
-			{
-				/* Fait avancer/reculer le tir s'il est enabled */
+			if(shot[i].enable == 1) {
+				/* Fait avancer/reculer le tir s'il est actif */
 				shot[i].y += shot[i].direction;
 
 				// Désactive le missile si celui-ci touche le bas de l ecran
@@ -354,8 +350,6 @@ void shots_impacts(void * cookie) {
 					shot[i].enable = 0;
 				else if(shot[i].y <= EDGE_NORTH + MISSILE_SIZE)
 					shot[i].enable = 0;
-
-
 
 				// Si le shot est à la hauteur du joueur
 				if((shot[i].y > (LCD_MAX_Y-20)) && (shot[i].direction == DIRECTION_DOWN))
@@ -408,13 +402,18 @@ void shots_impacts(void * cookie) {
 }
 
 
-
-// Actualise l'état des leds en fonction du nombre de vies du joueur
+/**
+ * Auteur : Christian Muller
+ *
+ * Actualise l'état des leds en fonction du nombre de vies du joueur
+ *
+ */
 void hp_update_leds() {
 
 	char buf;
 	int hp = player[0].lifes;
 
+	/* Limite les hp entre 0 et MAX_HP */
 	if(hp < 0)
 		hp = 0;
 	else if(hp > MAX_HP)
@@ -426,6 +425,7 @@ void hp_update_leds() {
 	buf &= 0xF0;
 	buf = buf >> MAX_HP;
 
+	/* Ecrit dans le registre i2c */
 	if((err = pca9554_write(NULL, &buf, 1, NULL)) < 0) {
 		printk("i2c write error : %d\n", err);
 	}
@@ -625,6 +625,11 @@ void game_main(void) {
 
 }
 
+/**
+ * Auteur : Christian Muller
+ *
+ * Invoque les vaisseaux alliés
+ */
 void reinforcement_handler() {
 	int i;
 
@@ -636,13 +641,20 @@ void reinforcement_handler() {
 		player[i].y = player[0].y;
 
 		/* Le décale à droite/gauche du vaisseau du joueur */
+		/* Les index impaires vont à droite */
 		if(i%2)
 			player[i].x = player[0].x+SHIP_SIZE*i/2+ALLIED_SHIPS_SPACING*i/2;
+		/* Les index paires vont à gauche */
 		else
 			player[i].x = player[0].x-ALLIED_SHIPS_SPACING*i/2;
 	}
 }
 
+/**
+ * Auteur : Christian Muller
+ *
+ * Effectue un nouveau tir au niveau des vaisseaux alliés
+ */
 void player_shots_handler() {
 	int i, k;
 

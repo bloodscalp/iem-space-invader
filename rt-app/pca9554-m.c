@@ -3,6 +3,8 @@
  *
  * Author: DRE
  * Date: December 2008
+ *
+ * Modifs : Christian Muller - janvier 2012 - code des fonctions
  *******************************************************************/
 
 #include <linux/init.h>
@@ -69,24 +71,31 @@ int pca9554_ioctl(struct inode * inode, struct file *file, unsigned int cmd, uns
 	return 0;
 }
 
+/**
+ * Lecture du registre i2c
+ */
 ssize_t pca9554_read(struct file *file, char __user *buff, size_t len, loff_t *off) {
 
 	int err, i;
 	char kbuf[len];
 
+	/* N'effectue la lecture que si le périph est OP */
 	if(pca9554_state == CONFIGURED) {
 		kbuf[0] = INPUT;
 
+		/* Indique qu'on veut lire */
 		if ((err = xeno_i2c_write(kbuf, 1)) < 0) {
 			printk("I2C write config error : %d\n", err);
 			return err;
 		}
 
+		/* Lis le registre */
 		if ((err = xeno_i2c_read(kbuf, len)) < 0) {
 			printk("I2C read error : %d\n", err);
 			return err;
 		} else {
 
+			/* Inverse les bits (le registre est en logique inverse) */
 			for(i=0; i<len; i++) {
 				kbuf[i] = ~kbuf[i];
 			}
@@ -96,6 +105,7 @@ ssize_t pca9554_read(struct file *file, char __user *buff, size_t len, loff_t *o
 				memcpy(buff, kbuf, len);
 			/* Si read est appelée depuis le userspace */
 			} else {
+				/* Copie sécurisée */
 				if ((err = copy_to_user(buff, kbuf, len)) > 0) {
 					printk("copy to user error : %d B not copied\n", err);
 					return err;
@@ -107,7 +117,6 @@ ssize_t pca9554_read(struct file *file, char __user *buff, size_t len, loff_t *o
 		printk("I2C device is not configured\n");
 		return -1;
 	}
-
 	return 0;
 }
 
