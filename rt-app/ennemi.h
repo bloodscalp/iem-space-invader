@@ -8,8 +8,6 @@
 #ifndef ENNEMI_H_
 #define ENNEMI_H_
 
-// doit être un multiple du nombre de vagues ennemies
-
 extern int ennemi_init(void);
 extern void move_ennemi(void* cookie);
 extern void ennemi_pos_y (void);

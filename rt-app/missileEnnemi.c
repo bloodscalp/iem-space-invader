@@ -14,6 +14,11 @@
 #include "lcdlib.h"
 #include "ennemi.h"
 
+/*
+ * Auteur : Failletaz Romain
+ *
+ * But : Cette tache gere le tir aleatoire des missiles ennemis
+ */
 void missile_ennemi(void *cookie) {
 
 	int err;
@@ -34,7 +39,7 @@ void missile_ennemi(void *cookie) {
 		err = rt_task_set_periodic(&missile_ennemi_task, TM_NOW,
 				PERIOD_TASK_MISSILE_ENNEMI * MS);
 		if (err != 0) {
-			printk("Missile ennemi events task set periodic failed: %d\n", err);
+			printk("Missile ennemi events task set aperiodic failed: %d\n", err);
 			return;
 		}
 	}
@@ -51,26 +56,24 @@ void missile_ennemi(void *cookie) {
 		}
 
 		// Random pour savoir si on va effectuer un tir ou non
-		// en fonction du level où l'on est
-		// On génére un nombre aléatoire de 1 à maxshotlvl (10)
-		// Si ce nombre est inférieur au niveau auxquel on est,
+		// en fonction du level ou l'on est
+		// On genere un nombre aleatoire de 1 a maxshotlvl (10)
+		// Si ce nombre est inferieur au niveau auxquel on est,
 		// on tir
 		if ((get_random() % maxshotlvl) + 1 <= speed) {
 
-			// Détecte si un vaisseau ennemi existe
+			// Detecte si un vaisseau ennemi existe
 			if (detectShipEnable()) {
 
 				while (1) {
 					// Choisi un vaisseau ennemi au hasard
+					// parmis les vaisseaux "vivants"
 					nbRandom = get_random() % nbEnnemis;
-
 					if (ennemi[nbRandom].enable == 1)
 						break;
 				}
 
-
-
-				// Tir un missile si le vaisseau ennemi existe
+				// Tir un missile du vaisseau choisi
 				shot[shot_free].x = ennemi[nbRandom].x + SHIP_SIZE / 2;
 				shot[shot_free].y = ennemi[nbRandom].y + SHIP_SIZE;
 				shot[shot_free].enable = 1;

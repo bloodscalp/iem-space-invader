@@ -13,13 +13,18 @@
 #include "gift.h"
 #include "lcdlib.h"
 
+/*
+ * Auteur : Failletaz Romain
+ *
+ * But : Cette tache gere le deplacement du bonus (verticalement).  
+ */
 void gift_weapon(void *cookie) {
 
 	int err;
 	int nbRandom = 0;
 	int tmpSpeed = 0;
 
-	/* Configuration de la tâche périodique */
+	/* Configuration de la tache periodique */
 	if (TIMER_PERIODIC) {
 		err = rt_task_set_periodic(&gift_task, TM_NOW, PERIOD_TASK_GIFT);
 		if (err != 0) {
@@ -30,14 +35,17 @@ void gift_weapon(void *cookie) {
 	} else {
 		err = rt_task_set_periodic(&gift_task, TM_NOW, PERIOD_TASK_GIFT * MS);
 		if (err != 0) {
-			printk("Gift events task set periodic failed: %d\n", err);
+			printk("Gift events task set aperiodic failed: %d\n", err);
 			return;
 		}
 	}
 	while (1) {
+		// Le bonus est disponible tout les "GIFREVERYLEVEL" niveaux.
 		if ((speed % GIFTEVERYLEVEL) == 0 ) {
+			// Cree le bonus lors d un nouveau niveau
 			if ((gift.enable == 0) && (tmpSpeed != speed)) {
-				tmpSpeed = speed;
+				// Sauvegarde le niveau
+                tmpSpeed = speed;
 
 				printk("Bonus lance x : %i y: %i\n", gift.x, gift.y);
 
@@ -47,17 +55,18 @@ void gift_weapon(void *cookie) {
 				// Fixe le cadeau
 				gift.x = nbRandom;
 				gift.y = EDGE_NORTH;
-
+                // Rend le cadeau visible
 				gift.enable = 1;
 
 			} else {
-				// se deplace verticalement
+				// Deplace le bonus verticalement si celui-ci est deja cree
 				gift.y = gift.y + STEP_GIFT;
+				
 				// Detection : cadeau touche player
 				if (touchPlayer()) {
 					gift.enable = 0;
 
-					// TODO: ajoute les deux alliés
+					// Bonus : Ajout des deux allies
 					reinforcement_handler();
 
 					//printk("Bonus obtenu\n");
@@ -68,7 +77,8 @@ void gift_weapon(void *cookie) {
 					//printk("Bonus perdu\n");
 				}
 			}
-
+        // Continue la decente du bonus s il y changement de niveau avant
+        // que le bonus ne soit ni gagne ou perdu par le joueur 
 		} else if( (tmpSpeed == speed-1) && (gift.y > EDGE_NORTH)) {
 			// se deplace verticalement
 			gift.y = gift.y + STEP_GIFT;
@@ -76,7 +86,7 @@ void gift_weapon(void *cookie) {
 			if (touchPlayer()) {
 				gift.enable = 0;
 
-				// TODO: ajoute les deux alliés
+				// TODO: ajoute les deux allies
 				reinforcement_handler();
 
 				//printk("Bonus obtenu\n");
@@ -87,6 +97,8 @@ void gift_weapon(void *cookie) {
 				//printk("Bonus perdu\n");
 			}
 		}
+		// Si le niveau ne correspond pas au "GIFREVERYLEVEL" 
+        // celui-ci n est pas disponible (affiche)
 		else {
 			gift.enable = 0;
 		}
@@ -95,6 +107,11 @@ void gift_weapon(void *cookie) {
 
 }
 
+/*
+ * Auteur : Failletaz Romain
+ *
+ * But : Retourne si le bonus est touche par le joueur  
+ */
 int touchPlayer(void) {
 	// Detection : ennemi touche player
 	if (gift.enable) {
@@ -112,6 +129,11 @@ int touchPlayer(void) {
 	return 0;
 }
 
+/*
+ * Auteur : Failletaz Romain
+ *
+ * But : Retourne si le bonus touche le sol 
+ */
 int touchGround(void) {
 	// Detecte si le cadeau touche le sol
 	if (gift.enable) {

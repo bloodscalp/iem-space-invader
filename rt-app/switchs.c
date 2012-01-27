@@ -2,7 +2,7 @@
  * switchs.c
  *
  *  Created on: 19 janv. 2012
- *      Author: redsuser
+ *      Author: Christian Muller
  */
 
 #include <native/task.h>

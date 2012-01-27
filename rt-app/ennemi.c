@@ -25,9 +25,12 @@
 #include "display.h"
 #include "ennemi.h"
 
+
 /*
- * Fonction qui retourne "true" s'il existe encore
- * un vaisseau ennemi en vie
+ * Auteur : Failletaz Romain
+ *
+ * But : Fonction qui retourne "true" s'il existe encore
+ *       un vaisseau ennemi en vie
  */
 bool detectShipEnable(void) {
 	int i;
@@ -40,13 +43,17 @@ bool detectShipEnable(void) {
 	return false;
 }
 
-// Initiaisation des vaisseaux ennemis
+/*
+ * Auteur : Failletaz Romain
+ *
+ * But : Initiaisation des vaisseaux ennemis
+ */
 int ennemi_init(void) {
 
 	int i, j;
 	//int nbEnnemiParVague;
 
-	// position de dÃ©part de la vague d'ennemis
+	// position de da�part de la vague d'ennemis
 	if (nbEnnemis % nbVagueEnnemis != 0) {
 		printk("Le nombre de vaisseaux par vague n'est pas conforme\n");
 		return -1;
@@ -62,12 +69,12 @@ int ennemi_init(void) {
 		for (j = 0; j < nbEnnemiParVague; j++) {
 			// Active tous les ennemis
 			ennemi[i * nbEnnemiParVague + j].enable = 1;
-			// RÃ©initialise les positions
+			// Ra�initialise les positions
 			ennemi[i * nbEnnemiParVague + j].x = xStart + (j * (SHIP_SIZE
 					+ X_SPACE));
 			ennemi[i * nbEnnemiParVague + j].y = yStart + (i * (SHIP_SIZE
 					+ Y_SPACE));
-			// Initialise le nombre de point de vie selon la difficultÃ©
+			// Initialise le nombre de point de vie selon la difficulta�
 			if(speed >= 1 && speed < 5)
 			{
 				ennemi[i * nbEnnemiParVague + j].pv = 1;
@@ -91,6 +98,12 @@ int ennemi_init(void) {
 
 }
 
+/*
+ * Auteur : Failletaz Romain
+ *
+ * But : Cette fonction affiche la position des ennemi.
+ *       A utiliser lors de phases de tests
+ */
 void show_ennemi(void) {
 	int i, j;
 
@@ -115,7 +128,11 @@ void show_ennemi(void) {
 	}
 }
 
-// Défini une nouvelle vague d'ennemis
+/*
+ * Auteur : Failletaz Romain
+ *
+ * But : Cette tache gere le deplacement et formation des ennemis
+ */
 void move_ennemi(void* cookie) {
 
 	int i;
@@ -129,7 +146,7 @@ void move_ennemi(void* cookie) {
 	// Position dernier vaisseaux en y
 	int yLastEnnemi;
 
-	// Configuration de la tâche périodique
+	// Configuration de la tache periodique
 	if (TIMER_PERIODIC) {
 		err = rt_task_set_periodic(&ennemi_task, TM_NOW, PERIOD_TASK_ENNEMI);
 		if (err != 0) {
@@ -141,7 +158,7 @@ void move_ennemi(void* cookie) {
 		err = rt_task_set_periodic(&ennemi_task, TM_NOW, PERIOD_TASK_ENNEMI
 				* MS);
 		if (err != 0) {
-			printk("Ennemi task set periodic failed: %d\n", err);
+			printk("Ennemi task set aperiodic failed: %d\n", err);
 			return;
 		}
 	}
@@ -151,40 +168,33 @@ void move_ennemi(void* cookie) {
 
 	directionChanged = false;
 
-	printk("*************************************************\n");
-	printk("Init ennemi\n");
-	printk("*************************************************\n");
-
 	//initialisation des vaisseaux ennemis
 	if (ennemi_init() < 0) {
 		printk("Error on ennemi init\n");
 		return;
 	}
 
-	// Test
-	//show_ennemi();
-	printk("*************************************************\n");
 	while (1) {
 
 		/****************************************************************/
 
-		/* DÃ©tection xLastEnnemi
+		/* Detection xLastEnnemi
 		 *
-		 * Nous testons si un des vaisseaux ennemis a touchÃ©
+		 * Nous testons si un des vaisseaux ennemis a touche
 		 * un bord (est/ouest), ceci, en fonction de leurs directions.
 		 *
 		 */
 
 		if (direction == DIRECTION_EST) {
 			xLastEnnemi = 0;
-			// detection du vaisseau le plus Ã  l'est
+			// detection du vaisseau le plus a l'est
 			for (i = 0; i < nbEnnemis; i++) {
 				if ((ennemi[i].x > xLastEnnemi) && (ennemi[i].enable == 1)) {
 					xLastEnnemi = ennemi[i].x;
 				}
 
 			}
-			// dÃ©tection vaisseaux touchent le bord Ã  l'est
+			// detection vaisseaux touchent le bord a�l'est
 			if (xLastEnnemi + SHIP_SIZE > EDGE_EAST - speed) {
 				direction = DIRECTION_OUEST;
 				directionChanged = true;
@@ -193,13 +203,13 @@ void move_ennemi(void* cookie) {
 
 		} else {
 			xLastEnnemi = EDGE_EAST;
-			// detection du vaisseau le plus Ã  l'ouest
+			// detection du vaisseau le plus a l'ouest
 			for (i = 0; i < nbEnnemis; i++) {
 				if ((ennemi[i].x < xLastEnnemi) && (ennemi[i].enable == 1)) {
 					xLastEnnemi = ennemi[i].x;
 				}
 			}
-			// detection vaisseaux touchent le bord Ã  l'est
+			// detection vaisseaux touchent le bord a l'est
 			if ((EDGE_WEST + speed) > xLastEnnemi) { //&& (xLastEnnemi <= EDGE_WEST)
 				direction = DIRECTION_EST;
 				yFirstEnnemi += Y_SPACE;
@@ -211,8 +221,8 @@ void move_ennemi(void* cookie) {
 
 		/* Detection yLastEnnemi
 		 *
-		 * Peu etre utilisÃ© lorsque les vaisseaux ennemis
-		 * atteignent les vaisseaux alliÃ©s
+		 * Peu etre utilise lorsque les vaisseaux ennemis
+		 * atteignent les vaisseaux allies
 		 */
 
 		yLastEnnemi = 0;
@@ -224,40 +234,26 @@ void move_ennemi(void* cookie) {
 
 		}
 
-		/****************************************************************/
+		// Detection : ennemi touche player
 
-		/*
-		 * Test : affiche si la direction doit changer (est <-> ouest)
+        if(yLastEnnemi >= (EDGE_SOUTH-2*SHIP_SIZE)){
+			for(i = 0; i < NB_PLAYER; i++)
+				if(player[i].enable == 1)
+					// provoque l explosion du joueur
+					player[i].enable = 2;
+		}
 
-		 if (directionChanged) {
-		 printk("changement de direction : oui\n");
-		 } else {
-		 printk("changement de direction : non\n");
-		 }
-
-		 printk("xLastEnnemi : %i\n", xLastEnnemi);
-		 printk("yLastEnnemi : %i\n", yLastEnnemi);
-
-		 printk("*************************************************\n");
-		 */
 		/****************************************************************/
 
 		/* Deplacement vaisseaux ennemis
 		 *
-		 * AprÃšs avoir effectuÃ© les tests de direction, nous pouvons alors
-		 * dÃ©placer les vaisseaux ennemis vers l'est ou l'ouest.
+		 * Apres avoir effectue les tests de direction, nous pouvons alors
+		 * deplacer les vaisseaux ennemis vers l'est ou l'ouest.
 		 *
 		 */
-
-		rt_mutex_lock(&mutex_ennemi, TM_INFINITE);
-
-		// Detection : ennemi touche player
-		if(yLastEnnemi >= (EDGE_SOUTH-2*SHIP_SIZE)){
-			for(i = 0; i < NB_PLAYER; i++)
-				if(player[i].enable == 1)
-					player[i].enable = 2;
-		}
-
+		 
+ 		rt_mutex_lock(&mutex_ennemi, TM_INFINITE); 
+		 		
 		for (i = 0; i < nbEnnemis; i++) {
 			if (directionChanged) {
 				ennemi[i].y += MOVE_ENNEMI_Y;
@@ -268,7 +264,8 @@ void move_ennemi(void* cookie) {
 		}
 
 		rt_mutex_unlock(&mutex_ennemi);
-
+        
+        // Le changement de direction a ete effectue
 		directionChanged = false;
 
 
